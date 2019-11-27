@@ -270,7 +270,7 @@ class _PhonesListState extends State<PhonesList> {
                               onPressed: () {
                                 var _n = -1;
                                 var _price = 0.0;
-                                var currency = '\$';
+                                var currency = 'L.L';
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {

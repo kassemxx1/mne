@@ -245,7 +245,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                               onPressed: () {
                                 var _n = -1;
                                 var _price = 0.0;
-                                var currency = '\$';
+                                var currency = 'L.L';
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -339,12 +339,13 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                   buttonColor: Theme.of(context)
                                                       .canvasColor,
                                                   buttonLables: [
-                                                    '\$',
                                                     'L.L',
+                                                    '\$',
                                                   ],
                                                   buttonValues: [
-                                                    '\$',
+
                                                     'L.L',
+                                                    '\$',
                                                   ],
                                                   radioButtonValue: (value) {
                                                     setState(() {

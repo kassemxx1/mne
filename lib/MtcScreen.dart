@@ -162,7 +162,7 @@ class _MtcScreenState extends State<MtcScreen> {
                               onPressed: () {
                                 var _n = -1.0;
                                 var _price = 0.0;
-                                var currency = '\$';
+                                var currency = 'L.L';
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {

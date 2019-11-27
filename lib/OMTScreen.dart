@@ -65,12 +65,14 @@ class _OMTScreenState extends State<OMTScreen> {
         final oout = msg.data['out'];
         final ccurency = msg.data['currency'];
         final ttime = msg.documentID;
+        final time = msg.data['timestamp'];
         setState(() {
           transaction.add({
             'in': IIN,
             'out': oout,
             'curency': ccurency,
-            'id': ttime
+            'id': ttime,
+            'time':time,
           });
           print(transaction);
         });
@@ -85,12 +87,14 @@ class _OMTScreenState extends State<OMTScreen> {
       final oout = msg.data['out'];
       final ccurency = msg.data['currency'];
       final ttime = msg.documentID;
+      final time = msg.data['timestamp'];
       setState(() {
         transaction.add({
           'in': IIN,
           'out': oout,
           'curency': ccurency,
-          'id': ttime
+          'id': ttime,
+          'time':time,
         });
         print(transaction);
       });
@@ -631,54 +635,59 @@ class _OMTScreenState extends State<OMTScreen> {
                                         },
                                         key: Key(transaction[index].toString()),
 
-                                        child: Row(
-                                          children: <Widget>[
-                                            Container(
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['in']
-                                                      .toString()}',
-                                                  style: TextStyle(
-                                                      color: Colors.green),),
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 85,
+                                        child: Card(
+                                          child: ListTile(
+                                            title: Text('${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),),
+                                            subtitle: Row(
+                                              children: <Widget>[
+                                                Container(
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(
+                                                        8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['in']
+                                                          .toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.green,fontSize: 10),),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black,)),
+                                                  width: 70,
+                                                ),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 70,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(
+                                                        8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['out']
+                                                          .toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.red,fontSize: 10),),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 50,
+                                                  child: Padding(
+                                                    padding: const EdgeInsets.all(
+                                                        8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['curency']
+                                                          .toString()}',
+                                                      style: TextStyle(color: Colors
+                                                          .blueAccent,fontSize: 10),),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 85,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['out']
-                                                      .toString()}',
-                                                  style: TextStyle(
-                                                      color: Colors.red),),
-                                              ),
-                                            ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 50,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['curency']
-                                                      .toString()}',
-                                                  style: TextStyle(color: Colors
-                                                      .blueAccent),),
-                                              ),
-                                            ),
-                                          ],
+                                          ),
                                         ),
                                       );
                                     }),

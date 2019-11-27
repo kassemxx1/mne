@@ -3,7 +3,9 @@ import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
+import 'package:mne/OMTScreen.dart' as prefix0;
 import 'constants.dart';
+import 'package:date_format/date_format.dart';
 
 final _firestore = Firestore.instance;
 var name = '';
@@ -70,7 +72,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
       final debt = msg.data['debt'];
       final den = msg.data['den'];
       final product = msg.data['product'];
-      final time = msg.data['timestamp'];
+      final time = msg.data['timestamp'] as Timestamp;
       final ttime = msg.documentID;
       setState(() {
         transaction.add({
@@ -234,29 +236,40 @@ class _ClientsScreenState extends State<ClientsScreen> {
       body: Column(
         children: <Widget>[
           textField,
-          Row(
-            children: <Widget>[
-              Text(mytext),
-              FutureBuilder(
-                  builder:
-                      (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                    return Center(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text('Debt:'),
-                          Text(
-                            '${qttnumbr.data}',
-                            style: TextStyle(
-                                fontSize: 16, color: Colors.blueAccent),
+          Center(
+            child: Row(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(mytext,style: TextStyle(fontSize: 25,color: Colors.blue),),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FutureBuilder(
+                      builder:
+                          (BuildContext context, AsyncSnapshot<double> qttnumbr) {
+                        return Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text('Debt:',style: TextStyle(fontSize: 20,color: Colors.grey),),
+                              ),
+                              Text(
+                                '${qttnumbr.data.round()}',
+                                style: TextStyle(
+                                    fontSize: 25, color: Colors.red),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                  initialData: 0.0,
-                  future: getqtt(mytext)),
-            ],
+                        );
+                      },
+                      initialData: 0.0,
+                      future: getqtt(mytext)),
+                ),
+              ],
+            ),
           ),
           Container(
             child: DropDownFormField(
@@ -368,6 +381,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'qtt': qtt,
                                 'debt': debt,
                                 'den': -DebtAnalysis,
+                                'timestamp':Timestamp.now(),
+                                'currnecy':'L.L',
                               });
                               setState(() {
                                 qtt = 0.0;
@@ -380,6 +395,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               _textEditingController3.clear();
 
                               Navigator.of(context).pop();
+                              gettransactiondate(mytext);
                             },
                             child: Text('Yes'),
                           ),
@@ -428,8 +444,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
 //                                      });
 //                                    }
 
-                                    print('${transaction[index]['id']}');
-                                    print(transaction[index]);
                                     await _firestore
                                         .collection('clients')
                                         .document('${transaction[index]['id']}')
@@ -438,50 +452,62 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                     transaction.remove(transaction[index]);
                                   },
                                   key: Key(transaction[index].toString()),
-                                  child: Row(
-                                    children: <Widget>[
-                                      Container(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            '${transaction[index]['debt'].toString()}',
-                                            style:
-                                                TextStyle(color: Colors.green),
+                                  child: Card(
+                                    child: ListTile(
+
+                                      title: Text('${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),),
+                                      subtitle: Row(
+                                        children: <Widget>[
+                                          Flexible(
+                                            child: Container(
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  '${transaction[index]['debt'].toString()}',
+                                                  style:
+                                                      TextStyle(color: Colors.green,fontSize: 10),
+                                                ),
+                                              ),
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.black)),
+                                              width: 70,
+                                            ),
                                           ),
-                                        ),
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.black)),
-                                        width: 85,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.black)),
-                                        width: 85,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            '${transaction[index]['den'].toString()}',
-                                            style: TextStyle(color: Colors.red),
+                                          Flexible(
+                                            child: Container( 
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.black)),
+                                              width: 70,
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  '${transaction[index]['den']}',
+                                                  style: TextStyle(color: Colors.red,fontSize: 10),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color: Colors.black)),
-                                        width: 50,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            '${transaction[index]['product'].toString()}',
-                                            style: TextStyle(
-                                                color: Colors.blueAccent),
+                                          Flexible(
+                                            child: Container(
+                                              width: 70,
+                                              decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Colors.black)),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  '${transaction[index]['product'].toString()}',
+                                                  style: TextStyle(
+                                                      color: Colors.blueAccent,fontSize: 10),
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 );
                               }),

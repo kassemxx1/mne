@@ -24,6 +24,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Future<double> getTodayIn(
       DateTime start, DateTime end, List list, String currency) async {
     list.clear();
+    final messsages1 = await _firestore
+        .collection('clients')
+        .where('currnecy', isEqualTo: currency)
+        .where('timestamp', isGreaterThan: start)
+        .where('timestamp', isLessThan: end)
+        .getDocuments();
     final messsages = await _firestore
         .collection('transaction')
         .where('currency', isEqualTo: currency)
@@ -35,6 +41,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
       setState(() {
         list.add(
           price,
+        );
+      });
+    }
+    for (var msg in messsages1.documents) {
+      final price = msg.data['den'];
+      setState(() {
+        list.add(
+          -price,
         );
       });
     }
