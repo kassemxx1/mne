@@ -3,7 +3,6 @@ import 'MainScreen.dart';
 import 'Selling.dart';
 import 'PhoneList.dart';
 import 'Invoices.dart';
-import 'Recharge_Screen.dart';
 import 'Accessories_Screen.dart';
 import 'ReportsScreen.dart';
 import 'OMTScreen.dart';
@@ -12,6 +11,9 @@ import 'MtcScreen.dart';
 import 'alfaAcreen.dart';
 import 'fanytelScreen.dart';
 import 'clientsScreen.dart';
+import 'phonecategories.dart';
+import 'phonecat.dart';
+import 'accessoriescat.dart';
 void main() => runApp(phone_sotre());
 
 class phone_sotre extends StatefulWidget {
@@ -29,7 +31,6 @@ class _phone_sotreState extends State<phone_sotre> {
         PhonesScreen.id : (context) => PhonesScreen(),
         PhonesList.id :(context) => PhonesList(),
         Invoices.id:(context) => Invoices(),
-        RechargeScreen.id:(context) => RechargeScreen(),
         AccessoriesScreen.id:(context) => AccessoriesScreen(),
         ReportsScreen.id:(context) => ReportsScreen(),
         OMTScreen.id:(context) =>OMTScreen(),
@@ -38,8 +39,9 @@ class _phone_sotreState extends State<phone_sotre> {
         AlfaScreen.id:(context) => AlfaScreen(),
         FanytelScreen.id:(context) =>FanytelScreen(),
         ClientsScreen.id:(context) =>ClientsScreen(),
-
-
+        phonecategories.id:(context) =>phonecategories(),
+        phonecat.id:(context) =>phonecat(),
+        accesscat.id:(context) =>accesscat(),
       },
     );
   }

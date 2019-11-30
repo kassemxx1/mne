@@ -3,11 +3,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'Rounded_Button.dart';
 import 'package:date_format/date_format.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 final _firestore = Firestore.instance;
 var now = new DateTime.now();
 int day = now.day;
@@ -43,6 +42,7 @@ class _OMTScreenState extends State<OMTScreen> {
       0);
   var tomorow = new DateTime(year, month, day, 23, 59, 59, 99, 99);
   var endDate = new DateTime(year, month, day, 23, 59, 59, 99, 99);
+  bool _saving=true;
 
 
 
@@ -52,6 +52,7 @@ class _OMTScreenState extends State<OMTScreen> {
       for (var msg in messages.documents) {
         setState(() {
           opening = msg.data['openning'];
+          _saving=false;
         });
       }
     }
@@ -75,6 +76,8 @@ class _OMTScreenState extends State<OMTScreen> {
             'time':time,
           });
           print(transaction);
+          _saving=false;
+
         });
       }
     }
@@ -139,7 +142,6 @@ class _OMTScreenState extends State<OMTScreen> {
     }
     @override
     void initState() {
-      // TODO: implement initState
       super.initState();
       getopen();
       gettransaction();
@@ -163,551 +165,558 @@ class _OMTScreenState extends State<OMTScreen> {
             'OMT', style: TextStyle(color: Colors.black, fontSize: 30),),
           backgroundColor: Colors.white,
         ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
-          child: Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: MaterialButton(
+        body: ModalProgressHUD(
+          inAsyncCall: _saving,
+          dismissible: true,
+          child: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Container(
+              child: ListView(
+
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MaterialButton(
+                      onPressed: () async {
+                        showDialog(context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                content: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text('Enter Opening Balance'),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 40, right: 40, top: 10),
+                                      child: new TextField(
+
+                                        controller: _textEditingController3,
+                                        decoration: KTextFieldImputDecoration
+                                            .copyWith(
+                                            hintText: 'Opening Balance'),
+                                        keyboardType: TextInputType.number,
+                                        onChanged: (value) async {
+                                          setState(() {
+                                            open = double.parse(value);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    MaterialButton(
+                                      onPressed: () async {
+                                        _firestore.collection('oppening')
+                                            .document('open')
+                                            .updateData({
+                                          'openning': open,
+                                        });
+                                        _textEditingController3.clear();
+                                        Navigator.of(context).pop();
+                                        getopen();
+                                      },
+                                      child: Text('Done'),
+                                    ),
+
+                                  ],
+                                ),
+
+                              );
+                            }
+                        );
+                      },
+                      child: Text('Enter Opening Balance', style: TextStyle(
+                        color: Colors.blueAccent, fontSize: 20,),),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Opening Balance =  ',
+                        style: TextStyle(color: Colors.black,),),
+                      Text('$opening',
+                        style: TextStyle(color: Colors.green, fontSize: 20),),
+
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CustomRadioButton(
+                      buttonColor: Theme
+                          .of(context)
+                          .canvasColor,
+                      buttonLables: [
+
+                        'L.L.',
+                        '\$',
+
+                      ],
+                      buttonValues: [
+                        'L.L.',
+                        '\$',
+                      ],
+                      radioButtonValue: (value) {
+                        setState(() {
+                          currency = value;
+                        });
+                      },
+                      selectedColor: Theme
+                          .of(context)
+                          .accentColor,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
+                    child: new TextField(
+                      controller: _textEditingController1,
+                      decoration: KTextFieldImputDecoration.copyWith(
+                          hintText: 'IN'),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          IN = double.parse(value);
+                        });
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
+                    child: new TextField(
+                      decoration: KTextFieldImputDecoration.copyWith(
+                          hintText: 'Out'),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        setState(() {
+                          out = double.parse(value);
+                        });
+                        print(out);
+                      },
+                      controller: _textEditingController2,
+                    ),
+                  ),
+                  RoundedButton(
+                    title: 'Send',
+                    colour: Colors.blueAccent,
+
                     onPressed: () async {
-                      showDialog(context: context,
+                      setState(() {
+                        _saving=true;
+                      });
+                      await _firestore.collection('omt').add({
+                        'in': IN,
+                        'out': out,
+                        'timestamp': Timestamp.now(),
+                        'currency': currency,
+                      });
+                      _textEditingController1.clear();
+                      _textEditingController2.clear();
+                      setState(() {
+                        out = 0.0;
+                        IN = 0.0;
+                      });
+                      getqtt('in', startDate, 'L.L.');
+                      getqtt('in', startDate, '\$');
+                      gettransaction();
+                      FocusScope.of(context).unfocus();
+                    },
+
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FutureBuilder(
+                            builder:
+                                (BuildContext context, AsyncSnapshot<
+                                double> qttnumbr) {
+                              return Center(
+                                child: Text(
+                                  'In  : ${qttnumbr.data.round()} L.L',
+                                  style: TextStyle(
+                                      color: Colors.green, fontSize: 18),
+                                ),
+                              );
+                            },
+                            initialData: 1.0,
+                            future: getqtt('in', startDate, 'L.L.')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FutureBuilder(
+                            builder:
+                                (BuildContext context, AsyncSnapshot<
+                                double> qttnumbr) {
+                              return Center(
+                                child: Text(
+                                  'Out  : ${qttnumbr.data.round()} L.L',
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 18),
+                                ),
+                              );
+                            },
+                            initialData: 1.0,
+                            future: getqtt('out', startDate, 'L.L.')),
+                      ),
+                    ],
+                  ),
+
+                  FutureBuilder(
+                      builder:
+                          (BuildContext context, AsyncSnapshot<double> qttnumbr) {
+                        return Center(
+                          child: Text(
+                            'Tolal  : ${qttnumbr.data.round() } L.L',
+                            style: TextStyle(color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                        );
+                      },
+                      initialData: 1.0,
+                      future: getsum(startDate, 'L.L.')),
+                  SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FutureBuilder(
+                            builder:
+                                (BuildContext context, AsyncSnapshot<
+                                double> qttnumbr) {
+                              return Center(
+                                child: Text(
+                                  'In  : ${qttnumbr.data} \$', style: TextStyle(
+                                    color: Colors.green, fontSize: 18),
+                                ),
+                              );
+                            },
+                            initialData: 1.0,
+                            future: getqtt('in', startDate, '\$')),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: FutureBuilder(
+                            builder:
+                                (BuildContext context, AsyncSnapshot<
+                                double> qttnumbr) {
+                              return Center(
+                                child: Text(
+                                  'Out  : ${qttnumbr.data} \$', style: TextStyle(
+                                    color: Colors.red, fontSize: 18),
+                                ),
+                              );
+                            },
+                            initialData: 1.0,
+                            future: getqtt('out', startDate, '\$')),
+                      ),
+                    ],
+                  ),
+
+                  FutureBuilder(
+                      builder:
+                          (BuildContext context, AsyncSnapshot<double> qttnumbr) {
+                        return Center(
+                          child: Text(
+                            'Tolal  : ${qttnumbr.data} \$',
+                            style: TextStyle(color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20),
+                          ),
+                        );
+                      },
+                      initialData: 1.0,
+                      future: getsum(startDate, '\$')),
+                  MaterialButton(
+                    onPressed: () {
+                      gettransaction();
+                      print(transaction);
+                      showDialog(
+
+                          context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              content: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text('Enter Opening Balance'),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 40, right: 40, top: 10),
-                                    child: new TextField(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(10.0))
+                              ),
+                              content: Scaffold(
+                                body: Container(
+                                  child: new ListView.builder(
+                                      itemCount: transaction.length,
 
-                                      controller: _textEditingController3,
-                                      decoration: KTextFieldImputDecoration
-                                          .copyWith(
-                                          hintText: 'Opening Balance'),
-                                      keyboardType: TextInputType.number,
-                                      onChanged: (value) async {
-                                        setState(() {
-                                          open = double.parse(value);
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  MaterialButton(
-                                    onPressed: () async {
-                                      _firestore.collection('oppening')
-                                          .document('open')
-                                          .updateData({
-                                        'openning': open,
-                                      });
-                                      _textEditingController3.clear();
-                                      Navigator.of(context).pop();
-                                      getopen();
-                                    },
-                                    child: Text('Done'),
-                                  ),
+                                      itemBuilder: (BuildContext cntxt,
+                                          int index) {
+                                        return Dismissible(
+                                          background: Material(
+                                            color: Colors.red,
+                                          ),
+                                          onDismissed: (
+                                              DismissDirection direction) async {
+//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
+//                                      for (DocumentSnapshot ds in snapshot.documents){
+//                                        ds.reference.delete();
+//                                      });
+//                                    }
 
-                                ],
+                                            print('${transaction[index]['id']}');
+                                            print(transaction[index]);
+                                            await _firestore.collection('omt')
+                                                .document(
+                                                '${transaction[index]['id']}')
+                                                .delete();
+                                            gettransaction();
+                                            transaction.remove(
+                                                transaction[index]);
+                                          },
+                                          key: Key(transaction[index].toString()),
+
+                                          child: Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      8.0),
+                                                  child: Text(
+                                                    '${transaction[index]['in']
+                                                        .toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.green),),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 85,
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 85,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      8.0),
+                                                  child: Text(
+                                                    '${transaction[index]['out']
+                                                        .toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.red),),
+                                                ),
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 50,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      8.0),
+                                                  child: Text(
+                                                    '${transaction[index]['curency']
+                                                        .toString()}',
+                                                    style: TextStyle(color: Colors
+                                                        .blueAccent),),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      }),
+                                ),
                               ),
 
                             );
                           }
                       );
                     },
-                    child: Text('Enter Opening Balance', style: TextStyle(
-                      color: Colors.blueAccent, fontSize: 20,),),
+                    child: Text('Daily Report', style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),),
+
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Opening Balance =  ',
-                      style: TextStyle(color: Colors.black,),),
-                    Text('$opening',
-                      style: TextStyle(color: Colors.green, fontSize: 20),),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(
+                      child: Row(
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Text('start Date:'),
+                              FlatButton(
+                                  onPressed: () {
+                                    DatePicker.showDatePicker(context,
+                                        showTitleActions: true,
+                                        minTime: DateTime(2019, 1, 1),
+                                        maxTime: DateTime(2025, 6, 7), onChanged: (date) {
 
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CustomRadioButton(
-                    buttonColor: Theme
-                        .of(context)
-                        .canvasColor,
-                    buttonLables: [
+                                        }, onConfirm: (date) {
+                                          setState(() {
+                                            startDate =date;
+                                          });
 
-                      'L.L.',
-                      '\$',
 
-                    ],
-                    buttonValues: [
-                      'L.L.',
-                      '\$',
-                    ],
-                    radioButtonValue: (value) {
-                      setState(() {
-                        currency = value;
-                      });
-                    },
-                    selectedColor: Theme
-                        .of(context)
-                        .accentColor,
+
+                                          print(startDate);
+                                        }, currentTime: DateTime.now(), locale: LocaleType.en);
+                                  },
+                                  child: Text(
+                                    '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
+                                    style: TextStyle(color: Colors.blue,fontSize: 11),
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Text('End Date:'),
+                              FlatButton(
+                                  onPressed: () {
+                                    DatePicker.showDatePicker(context,
+                                        showTitleActions: true,
+                                        minTime: DateTime(2019, 1, 1),
+                                        maxTime: DateTime(2025, 6, 7), onChanged: (date) {
+
+                                        }, onConfirm: (date) {
+                                          setState(() {
+                                            endDate =date.add(new Duration(hours: 23,minutes: 59,seconds: 59));
+                                          });
+
+
+
+
+                                        }, currentTime: DateTime.now(), locale: LocaleType.en);
+                                  },
+                                  child: Text(
+                                    '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
+                                    style: TextStyle(color: Colors.blue,fontSize: 11),
+                                  )),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
-                  child: new TextField(
-                    controller: _textEditingController1,
-                    decoration: KTextFieldImputDecoration.copyWith(
-                        hintText: 'IN'),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        IN = double.parse(value);
-                      });
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 50, right: 50, top: 10),
-                  child: new TextField(
-                    decoration: KTextFieldImputDecoration.copyWith(
-                        hintText: 'Out'),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        out = double.parse(value);
-                      });
-                      print(out);
-                    },
-                    controller: _textEditingController2,
-                  ),
-                ),
-                RoundedButton(
-                  title: 'Send',
-                  colour: Colors.blueAccent,
 
-                  onPressed: () async {
-                    await _firestore.collection('omt').add({
-                      'in': IN,
-                      'out': out,
-                      'timestamp': Timestamp.now(),
-                      'currency': currency,
-                    });
-                    _textEditingController1.clear();
-                    _textEditingController2.clear();
-                    setState(() {
-                      out = 0.0;
-                      IN = 0.0;
-                    });
-                    getqtt('in', startDate, 'L.L.');
-                    getqtt('in', startDate, '\$');
-                    gettransaction();
-                    FocusScope.of(context).unfocus();
-                  },
+                  MaterialButton(
+                    onPressed: () {
+                      gettransactiondate(startDate, endDate);
+                      print(transaction);
+                      showDialog(
 
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FutureBuilder(
-                          builder:
-                              (BuildContext context, AsyncSnapshot<
-                              double> qttnumbr) {
-                            return Center(
-                              child: Text(
-                                'In  : ${qttnumbr.data.round()} L.L',
-                                style: TextStyle(
-                                    color: Colors.green, fontSize: 18),
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(10.0))
                               ),
-                            );
-                          },
-                          initialData: 1.0,
-                          future: getqtt('in', startDate, 'L.L.')),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FutureBuilder(
-                          builder:
-                              (BuildContext context, AsyncSnapshot<
-                              double> qttnumbr) {
-                            return Center(
-                              child: Text(
-                                'Out  : ${qttnumbr.data.round()} L.L',
-                                style: TextStyle(
-                                    color: Colors.red, fontSize: 18),
-                              ),
-                            );
-                          },
-                          initialData: 1.0,
-                          future: getqtt('out', startDate, 'L.L.')),
-                    ),
-                  ],
-                ),
+                              content: Scaffold(
+                                body: Container(
+                                  child: new ListView.builder(
+                                      itemCount: transaction.length,
 
-                FutureBuilder(
-                    builder:
-                        (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                      return Center(
-                        child: Text(
-                          'Tolal  : ${qttnumbr.data.round() } L.L',
-                          style: TextStyle(color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                      );
-                    },
-                    initialData: 1.0,
-                    future: getsum(startDate, 'L.L.')),
-                SizedBox(height: 20,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FutureBuilder(
-                          builder:
-                              (BuildContext context, AsyncSnapshot<
-                              double> qttnumbr) {
-                            return Center(
-                              child: Text(
-                                'In  : ${qttnumbr.data} \$', style: TextStyle(
-                                  color: Colors.green, fontSize: 18),
-                              ),
-                            );
-                          },
-                          initialData: 1.0,
-                          future: getqtt('in', startDate, '\$')),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: FutureBuilder(
-                          builder:
-                              (BuildContext context, AsyncSnapshot<
-                              double> qttnumbr) {
-                            return Center(
-                              child: Text(
-                                'Out  : ${qttnumbr.data} \$', style: TextStyle(
-                                  color: Colors.red, fontSize: 18),
-                              ),
-                            );
-                          },
-                          initialData: 1.0,
-                          future: getqtt('out', startDate, '\$')),
-                    ),
-                  ],
-                ),
-
-                FutureBuilder(
-                    builder:
-                        (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                      return Center(
-                        child: Text(
-                          'Tolal  : ${qttnumbr.data} \$',
-                          style: TextStyle(color: Colors.green,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20),
-                        ),
-                      );
-                    },
-                    initialData: 1.0,
-                    future: getsum(startDate, '\$')),
-                MaterialButton(
-                  onPressed: () {
-                    gettransaction();
-                    print(transaction);
-                    showDialog(
-
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(10.0))
-                            ),
-                            content: Scaffold(
-                              body: Container(
-                                child: new ListView.builder(
-                                    itemCount: transaction.length,
-
-                                    itemBuilder: (BuildContext cntxt,
-                                        int index) {
-                                      return Dismissible(
-                                        background: Material(
-                                          color: Colors.red,
-                                        ),
-                                        onDismissed: (
-                                            DismissDirection direction) async {
+                                      itemBuilder: (BuildContext cntxt,
+                                          int index) {
+                                        return Dismissible(
+                                          background: Material(
+                                            color: Colors.red,
+                                          ),
+                                          onDismissed: (
+                                              DismissDirection direction) async {
 //                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
 //                                      for (DocumentSnapshot ds in snapshot.documents){
 //                                        ds.reference.delete();
 //                                      });
 //                                    }
 
-                                          print('${transaction[index]['id']}');
-                                          print(transaction[index]);
-                                          await _firestore.collection('omt')
-                                              .document(
-                                              '${transaction[index]['id']}')
-                                              .delete();
-                                          gettransaction();
-                                          transaction.remove(
-                                              transaction[index]);
-                                        },
-                                        key: Key(transaction[index].toString()),
+                                            print('${transaction[index]['id']}');
+                                            print(transaction[index]);
+                                            await _firestore.collection('omt')
+                                                .document(
+                                                '${transaction[index]['id']}')
+                                                .delete();
+                                            gettransaction();
+                                            transaction.remove(
+                                                transaction[index]);
+                                          },
+                                          key: Key(transaction[index].toString()),
 
-                                        child: Row(
-                                          children: <Widget>[
-                                            Container(
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['in']
-                                                      .toString()}',
-                                                  style: TextStyle(
-                                                      color: Colors.green),),
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 85,
-                                            ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 85,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['out']
-                                                      .toString()}',
-                                                  style: TextStyle(
-                                                      color: Colors.red),),
-                                              ),
-                                            ),
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: Colors.black)),
-                                              width: 50,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(
-                                                    8.0),
-                                                child: Text(
-                                                  '${transaction[index]['curency']
-                                                      .toString()}',
-                                                  style: TextStyle(color: Colors
-                                                      .blueAccent),),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                              ),
-                            ),
-
-                          );
-                        }
-                    );
-                  },
-                  child: Text('Daily Report', style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),),
-
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Row(
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Text('start Date:'),
-                            FlatButton(
-                                onPressed: () {
-                                  DatePicker.showDatePicker(context,
-                                      showTitleActions: true,
-                                      minTime: DateTime(2019, 1, 1),
-                                      maxTime: DateTime(2025, 6, 7), onChanged: (date) {
-
-                                      }, onConfirm: (date) {
-                                        setState(() {
-                                          startDate =date;
-                                        });
-
-
-
-                                        print(startDate);
-                                      }, currentTime: DateTime.now(), locale: LocaleType.en);
-                                },
-                                child: Text(
-                                  '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
-                                  style: TextStyle(color: Colors.blue),
-                                )),
-                          ],
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text('End Date:'),
-                            FlatButton(
-                                onPressed: () {
-                                  DatePicker.showDatePicker(context,
-                                      showTitleActions: true,
-                                      minTime: DateTime(2019, 1, 1),
-                                      maxTime: DateTime(2025, 6, 7), onChanged: (date) {
-
-                                      }, onConfirm: (date) {
-                                        setState(() {
-                                          endDate =date.add(new Duration(hours: 23,minutes: 59,seconds: 59));
-                                        });
-
-
-
-
-                                      }, currentTime: DateTime.now(), locale: LocaleType.en);
-                                },
-                                child: Text(
-                                  '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
-                                  style: TextStyle(color: Colors.blue),
-                                )),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                MaterialButton(
-                  onPressed: () {
-                    gettransactiondate(startDate, endDate);
-                    print(transaction);
-                    showDialog(
-
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(10.0))
-                            ),
-                            content: Scaffold(
-                              body: Container(
-                                child: new ListView.builder(
-                                    itemCount: transaction.length,
-
-                                    itemBuilder: (BuildContext cntxt,
-                                        int index) {
-                                      return Dismissible(
-                                        background: Material(
-                                          color: Colors.red,
-                                        ),
-                                        onDismissed: (
-                                            DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                          print('${transaction[index]['id']}');
-                                          print(transaction[index]);
-                                          await _firestore.collection('omt')
-                                              .document(
-                                              '${transaction[index]['id']}')
-                                              .delete();
-                                          gettransaction();
-                                          transaction.remove(
-                                              transaction[index]);
-                                        },
-                                        key: Key(transaction[index].toString()),
-
-                                        child: Card(
-                                          child: ListTile(
-                                            title: Text('${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),),
-                                            subtitle: Row(
-                                              children: <Widget>[
-                                                Container(
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(
-                                                        8.0),
-                                                    child: Text(
-                                                      '${transaction[index]['in']
-                                                          .toString()}',
-                                                      style: TextStyle(
-                                                          color: Colors.green,fontSize: 10),),
+                                          child: Card(
+                                            child: ListTile(
+                                              title: Text('${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),),
+                                              subtitle: Row(
+                                                children: <Widget>[
+                                                  Container(
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(
+                                                          8.0),
+                                                      child: Text(
+                                                        '${transaction[index]['in']
+                                                            .toString()}',
+                                                        style: TextStyle(
+                                                            color: Colors.green,fontSize: 10),),
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors.black,)),
+                                                    width: 70,
                                                   ),
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.black,)),
-                                                  width: 70,
-                                                ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  width: 70,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(
-                                                        8.0),
-                                                    child: Text(
-                                                      '${transaction[index]['out']
-                                                          .toString()}',
-                                                      style: TextStyle(
-                                                          color: Colors.red,fontSize: 10),),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors.black)),
+                                                    width: 70,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(
+                                                          8.0),
+                                                      child: Text(
+                                                        '${transaction[index]['out']
+                                                            .toString()}',
+                                                        style: TextStyle(
+                                                            color: Colors.red,fontSize: 10),),
+                                                    ),
                                                   ),
-                                                ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  width: 50,
-                                                  child: Padding(
-                                                    padding: const EdgeInsets.all(
-                                                        8.0),
-                                                    child: Text(
-                                                      '${transaction[index]['curency']
-                                                          .toString()}',
-                                                      style: TextStyle(color: Colors
-                                                          .blueAccent,fontSize: 10),),
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors.black)),
+                                                    width: 50,
+                                                    child: Padding(
+                                                      padding: const EdgeInsets.all(
+                                                          8.0),
+                                                      child: Text(
+                                                        '${transaction[index]['curency']
+                                                            .toString()}',
+                                                        style: TextStyle(color: Colors
+                                                            .blueAccent,fontSize: 10),),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    }),
+                                        );
+                                      }),
+                                ),
                               ),
-                            ),
 
-                          );
-                        }
-                    );
-                  },
-                  child: Text('Transaction Report', style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),),
+                            );
+                          }
+                      );
+                    },
+                    child: Text('Transaction Report', style: TextStyle(
+                      color: Colors.blueAccent,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),),
 
-                ),
+                  ),
 
 
-              ],
+                ],
+              ),
             ),
           ),
         ),

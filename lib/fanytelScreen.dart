@@ -22,6 +22,8 @@ class _FanytelScreenState extends State<FanytelScreen> {
     for (var msg in messages.documents) {
       final qtt = msg['qtt'];
       qtts.add(qtt.toDouble());
+
+
     }
 
     var result = qtts.reduce((sum, element) => sum + element);

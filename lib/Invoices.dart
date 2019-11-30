@@ -201,11 +201,10 @@ class _InvoicesState extends State<Invoices> {
             } else {
               return Container(
                 height: 40,
-
                 child: Dismissible(
                     background: Material(
-                  color: Colors.red,
-                ),
+                      color: Colors.red,
+                    ),
                     onDismissed: (DismissDirection direction) {
                       listofInvoice.remove(listofInvoice[index - 5]);
                       print(listofInvoice);
@@ -214,8 +213,8 @@ class _InvoicesState extends State<Invoices> {
                     child: Center(
                       child: Container(
                         color: Colors.blueAccent[50],
-                        decoration:
-                            BoxDecoration(border: Border.all(color: Colors.black)),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black)),
                         child: Row(children: <Widget>[
                           Padding(
                             padding: const EdgeInsets.all(8.0),
