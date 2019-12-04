@@ -87,7 +87,7 @@ class _OtherScrennState extends State<OtherScrenn> {
                         _firestore.collection('others').add({
                           'name':'spending',
                           'timestamp':now,
-                          'decsription':spendDescription,
+                          'description':spendDescription,
                           'price':-spendprice,
                           'currency':'L.L'
 
@@ -154,9 +154,9 @@ class _OtherScrennState extends State<OtherScrenn> {
                           _saving=true;
                         });
                         _firestore.collection('others').add({
-                          'name':'maintenace',
+                          'name':'maintenance',
                           'timestamp':now,
-                          'decsription':maintenanceDescription,
+                          'description':maintenanceDescription,
                           'price':maintenanceprice,
                           'currency':'L.L'
 

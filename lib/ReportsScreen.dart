@@ -18,6 +18,8 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   var transaction = [];
+  var Mtransaction=[];
+  var Stransaction=[];
   var tomorow = new DateTime(year, month, day, 23, 59, 59, 99, 99);
   var startDate = DateTime(year, month, day, 0, 0, 0, 0, 0);
   var endDate = new DateTime(year, month, day, 23, 59, 59, 99, 99);
@@ -45,7 +47,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         .where('timestamp', isGreaterThan: start)
         .where('timestamp', isLessThan: end)
         .getDocuments();
-    final messages2= await _firestore.collection('others').where('currnecy', isEqualTo: currency)
+    final messages2= await _firestore.collection('others').where('currency', isEqualTo: currency)
         .where('timestamp', isGreaterThan: start)
         .where('timestamp', isLessThan: end)
         .getDocuments();
@@ -69,13 +71,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
       final price = msg.data['price'];
       setState(() {
         list.add(
-          -price,
+          price,
         );
       });
     }
     var result = list.reduce((sum, element) => sum + element);
     return new Future(() => result);
   }
+  void getmaintenance(DateTime s,DateTime e,String name,List Otransaction)async{
+    final messages=await _firestore.collection('others').where('timestamp',isGreaterThan: s).where('timestamp',isLessThan: e).where('name',isEqualTo: name).getDocuments();
+   Otransaction.clear();
+    for(var msg in messages.documents){
+      final des=msg.data['description'];
+      final price=msg.data['price'];
+      final id=msg.documentID;
+      final time=msg.data['timestamp'];
+      setState(() {
+        Otransaction.add({
+          'description':des,
+          'price':price,
+          'id':id,
+          'time':time
+
+        });
+      });
+
+
+    }
+  }
+
 
   Future<double> getqtt(String name) async {
     var qtts = [0.0];
@@ -145,9 +169,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   void initState() {
+
     // TODO: implement initState
     super.initState();
     gettransactiondate(startDate, endDate);
+    getmaintenance(startDate ,endDate, 'maintenance', Mtransaction);
+    getmaintenance(startDate ,endDate, 'spending', Stransaction);
     delay();
   }
 
@@ -603,6 +630,229 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
               ),
+              MaterialButton(
+                onPressed: () {
+                  getmaintenance(startDate, endDate,'maintenance',Mtransaction);
+                  print(transaction);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                          content: Scaffold(
+                            body: Container(
+                              child: new ListView.builder(
+                                  itemCount: Mtransaction.length,
+                                  itemBuilder: (BuildContext cntxt, int index) {
+                                    return Dismissible(
+                                      background: Material(
+                                        color: Colors.red,
+                                      ),
+                                      onDismissed:
+                                          (DismissDirection direction) async {
+//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
+//                                      for (DocumentSnapshot ds in snapshot.documents){
+//                                        ds.reference.delete();
+//                                      });
+//                                    }
+
+                                        print('${transaction[index]['id']}');
+                                        print(transaction[index]);
+                                        await _firestore
+                                            .collection('others')
+                                            .document(
+                                            '${transaction[index]['id']}')
+                                            .delete();
+                                        getmaintenance(startDate, endDate,'maintenance',Mtransaction);
+                                        transaction.remove(Mtransaction[index]);
+                                      },
+                                      key: Key(Mtransaction[index].toString()),
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(
+                                            '${formatDate(DateTime.parse(Mtransaction[index]['time'].toDate().toString()), [
+                                              yyyy,
+                                              '-',
+                                              mm,
+                                              '-',
+                                              dd
+                                            ])}',
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12),
+                                          ),
+                                          subtitle: Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${Mtransaction[index]['description'].toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontSize: 10),
+                                                  ),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                    )),
+                                                width: 70,
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 70,
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${Mtransaction[index]['price'].toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: 10),
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          ),
+                        );
+                      });
+                },
+                child: Text(
+                  'Maintenance Report',
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  getmaintenance(startDate, endDate,'spending',Stransaction);
+                  print(transaction);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                          content: Scaffold(
+                            body: Container(
+                              child: new ListView.builder(
+                                  itemCount: Stransaction.length,
+                                  itemBuilder: (BuildContext cntxt, int index) {
+                                    return Dismissible(
+                                      background: Material(
+                                        color: Colors.red,
+                                      ),
+                                      onDismissed:
+                                          (DismissDirection direction) async {
+//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
+//                                      for (DocumentSnapshot ds in snapshot.documents){
+//                                        ds.reference.delete();
+//                                      });
+//                                    }
+
+                                        print('${transaction[index]['id']}');
+                                        print(transaction[index]);
+                                        await _firestore
+                                            .collection('others')
+                                            .document(
+                                            '${transaction[index]['id']}')
+                                            .delete();
+                                        getmaintenance(startDate, endDate,'spending',Stransaction);
+                                        transaction.remove(Stransaction[index]);
+                                      },
+                                      key: Key(Stransaction[index].toString()),
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(
+                                            '${formatDate(DateTime.parse(Stransaction[index]['time'].toDate().toString()), [
+                                              yyyy,
+                                              '-',
+                                              mm,
+                                              '-',
+                                              dd
+                                            ])}',
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 12),
+                                          ),
+                                          subtitle: Row(
+                                            children: <Widget>[
+                                              Container(
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${Stransaction[index]['description'].toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontSize: 10),
+                                                  ),
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.black,
+                                                    )),
+                                                width: 70,
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 70,
+                                                child: Padding(
+                                                  padding:
+                                                  const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    '${Stransaction[index]['price'].toString()}',
+                                                    style: TextStyle(
+                                                        color: Colors.red,
+                                                        fontSize: 10),
+                                                  ),
+                                                ),
+                                              ),
+
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          ),
+                        );
+                      });
+                },
+                child: Text(
+                  'Spending Report',
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+
+
+
+
+
             ],
           ),
         ));

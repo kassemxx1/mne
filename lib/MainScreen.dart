@@ -29,22 +29,23 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    borderOnForeground: true,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.phone_iphone,
-                          size: 20,
-                          color: Colors.black54,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, phonecategories.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, phonecategories.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      borderOnForeground: true,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.phone_iphone,
+                            size: 20,
+                            color: Colors.black54,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                               'Phones',
@@ -52,12 +53,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 22, color: Colors.black),
                             )),
                           ),
-                        ),
-                        Text(
-                          'Apple,Samsung,Huawei,Used',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Apple,Samsung,Huawei,Used',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -65,21 +66,22 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.calendar_view_day,
-                          color: Colors.black54,
-                          size: 20,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, RechargeCategories.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, RechargeCategories.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.calendar_view_day,
+                            color: Colors.black54,
+                            size: 20,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                               'Recharge',
@@ -87,12 +89,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 20, color: Colors.black),
                             )),
                           ),
-                        ),
-                        Text(
-                          'Mtc,Alfa,Days,\$',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Mtc,Alfa,Days,\$',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -100,20 +102,21 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.mobile_screen_share,
-                          color: Colors.black54,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, accesscat.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, accesscat.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.mobile_screen_share,
+                            color: Colors.black54,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                               'Accessories',
@@ -121,12 +124,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 22, color: Colors.black),
                             )),
                           ),
-                        ),
-                        Text(
-                          'Protection,Cover,Speakers,Memory and Others..',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Protection,Cover,Speakers,Memory and Others..',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -134,20 +137,21 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.attach_money,
-                          color: Colors.black54,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, OMTScreen.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, OMTScreen.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.attach_money,
+                            color: Colors.black54,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                               'OMT',
@@ -155,12 +159,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 22, color: Colors.black),
                             )),
                           ),
-                        ),
-                        Text(
-                          'Transfer Money',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Transfer Money',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -168,20 +172,21 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.cached,
-                          color: Colors.black54,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, OtherScrenn.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, OtherScrenn.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.cached,
+                            color: Colors.black54,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                                   'Others',
@@ -189,12 +194,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 22, color: Colors.black),
                                 )),
                           ),
-                        ),
-                        Text(
-                          'Maintenance & Spending',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Maintenance & Spending',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -202,20 +207,21 @@ class _MainScreenState extends State<MainScreen> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.people,
-                          color: Colors.black54,
-                        ),
-                        MaterialButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, ClientsScreen.id);
-                          },
-                          child: Container(
+                  child: GestureDetector(
+                    onTap: (){
+                      Navigator.pushNamed(context, ClientsScreen.id);
+                    },
+                    child: Card(
+                      color: Colors.yellow,
+                      elevation: 20,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(
+                            Icons.people,
+                            color: Colors.black54,
+                          ),
+                          Container(
                             child: Center(
                                 child: Text(
                               'clients',
@@ -223,12 +229,12 @@ class _MainScreenState extends State<MainScreen> {
                                   TextStyle(fontSize: 22, color: Colors.black),
                             )),
                           ),
-                        ),
-                        Text(
-                          'Report of all Your debt & Clients',
-                          style: TextStyle(color: Colors.black),
-                        )
-                      ],
+                          Text(
+                            'Report of all Your debt & Clients',
+                            style: TextStyle(color: Colors.black),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),

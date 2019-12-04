@@ -68,7 +68,7 @@ class _accesscatState extends State<accesscat> {
                     color: Colors.yellow,
                     child: MaterialButton(
                       child: Container(
-                        child: Center(child: Text('Holo',style: TextStyle(color: Colors.black,fontSize: 30),)),
+                        child: Center(child: Text('Hoco',style: TextStyle(color: Colors.black,fontSize: 30),)),
                       ),
                       onPressed: (){
                         setState(() {
