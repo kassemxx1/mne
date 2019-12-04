@@ -15,45 +15,74 @@ class _phonecategoriesState extends State<phonecategories> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Categories',style: TextStyle(color: Colors.black),),
-          backgroundColor: Colors.white,
+          backgroundColor: Colors.yellow,
           leading: new IconButton(
-        icon: new Icon(Icons.arrow_back, color: Colors.black),
+        icon: new Icon(Icons.arrow_back, color: Colors.black54),
         onPressed: () => Navigator.of(context).pop(),
       ),
         ),
         body: Container(
+          color: Colors.black54,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
+              color: Colors.black54,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
 
 
                 children: <Widget>[
-                  Expanded(
-                    child: MaterialButton(
-                      child: Container(
-                        color: Colors.white,
-                        child: Center(child: Text('New',style: TextStyle(color: Colors.black,fontSize: 30),)),
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Card(
+                        elevation: 50,
+                        color: Colors.yellow,
+                        child: Center(
+                          child: MaterialButton(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.mobile_screen_share,color: Colors.black54,size: 30,),
+                                Text('New',style: TextStyle(color: Colors.black,fontSize: 30),),
+                                Text('Apple,Samsung,Huwaei and Others',style: TextStyle(color: Colors.black),),
+                              ],
+                            ),
+                            onPressed: (){
+                              Navigator.pushNamed(context, phonecat.id);
+                            },
+                          ),
+                        ),
                       ),
-                      onPressed: (){
-                        Navigator.pushNamed(context, phonecat.id);
-                      },
                     ),
                   ),
-                  Expanded(
-                    child: MaterialButton(
-                      child: Container(
-                        color: Colors.white,
-                        child: Center(child: Text('Used',style: TextStyle(color: Colors.black,fontSize: 30),)),
-                      ),
-                      onPressed: (){
-                        setState(() {
-                          PhonesList.subcat='used';
-                        });
-                        Navigator.pushNamed(context, PhonesList.id);
+                  Flexible(
+                    child: Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Card(
+                        elevation: 50,
+                        color: Colors.yellow,
+                        child: Center(
+                          child: MaterialButton(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Icon(Icons.phonelink_setup,color: Colors.black54,size: 30,),
+                                Text('Used',style: TextStyle(color: Colors.black,fontSize: 30),),
+                                Text('Apple,Samsung,Huwaei and Others',style: TextStyle(color: Colors.black),),
 
-                      },
+                              ],
+                            ),
+                            onPressed: (){
+                              setState(() {
+                                PhonesList.subcat='used';
+                              });
+                              Navigator.pushNamed(context, PhonesList.id);
+
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],

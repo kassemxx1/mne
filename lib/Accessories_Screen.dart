@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 final _firestore = Firestore.instance;
 FirebaseStorage _storage = FirebaseStorage.instance;
+
 class AccessoriesScreen extends StatefulWidget {
   static const String id='Accessories_Screen';
   static String accesscat='';
@@ -26,7 +27,8 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
   var nameOfItem='';
   var PriceOfItem='';
   bool _saving=true;
-
+  bool _save=false;
+  DateTime now ;
 
   Future delay() async{
     await new Future.delayed(new Duration(seconds: 5), ()
@@ -42,11 +44,17 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
 
   Future<String> uploadPic() async {
 
+
     //Get the file from the image picker and store it
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+
+      now=DateTime.now();
+      _save=true;
+    });
 
     //Create a reference to the location you want to upload to in firebase
-    StorageReference reference = _storage.ref().child('images/');
+    StorageReference reference = _storage.ref().child(now.toString());
 
     //Upload the file to firebase
     StorageUploadTask uploadTask = reference.putFile(image);
@@ -55,8 +63,11 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
     String location = await (await uploadTask.onComplete).ref.getDownloadURL() as String;
     print(location);
     setState(() {
-      upload ='Uploade';
+      _save=false;
+      upload ='Uploaded';
       ImageLink = location;
+
+      print(_save);
     });
 
     //returns the download url
@@ -78,8 +89,8 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
     }
   }
 
-  Future<int> getqtt(String name) async {
-    var qtts = [0];
+  Future<double> getqtt(String name) async {
+    var qtts = [0.0];
 
     final messages = await _firestore
         .collection('transaction')
@@ -102,326 +113,367 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ModalProgressHUD(
-        inAsyncCall: _saving,
-        dismissible: true,
-        child: Container(
-          color: Colors.white24,
-          child: CustomScrollView(
-            slivers: <Widget>[
-              SliverAppBar(
-                actions: <Widget>[
-                  IconButton(icon:Icon(Icons.add,color: Colors.black,),
+    return SafeArea(
+      child: Scaffold(
+        body: ModalProgressHUD(
 
-                      onPressed:(){
-                        showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: Form(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      MaterialButton(
-                                        onPressed: (){
-                                          setState(() {
+          inAsyncCall: _saving,
+          dismissible: true,
+          child: Container(
+            color: Colors.white24,
+            child: CustomScrollView(
+              slivers: <Widget>[
+                SliverAppBar(
 
-                                            uploadPic();
-                                          },);
-                                        },
-                                        child: Text(upload),
-                                      ),
+                  actions: <Widget>[
+                    IconButton(icon:Icon(Icons.add,color: Colors.black,),
 
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10,top: 10),
-                                        child: TextField(
-                                          keyboardType: TextInputType
-                                              .emailAddress,
-                                          textAlign: TextAlign.center,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              nameOfItem = value;
-                                            });
-                                          },
-                                          decoration:
-                                          KTextFieldImputDecoration
-                                              .copyWith(
-                                              hintText:
-                                              'Enter the Name Of Item'),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 10,top: 10),
-                                        child: TextField(
-                                          keyboardType: TextInputType
-                                              .emailAddress,
-                                          textAlign: TextAlign.center,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              PriceOfItem =
-                                                  value;
-                                            });
-                                          },
-                                          decoration:
-                                          KTextFieldImputDecoration
-                                              .copyWith(
-                                              hintText:
-                                              'Enter the Price Of Item in \$'),
-                                        ),
-                                      ),
-                                      MaterialButton(
-                                          child: Text('Add',style: TextStyle(fontSize: 30,color: Colors.blueAccent),),
-                                          onPressed: (){
-                                            _firestore.collection('accessories').add({
-                                              'phonename':nameOfItem,
-                                              'price': PriceOfItem,
-                                              'image': ImageLink,
-                                              'INOUT': 'out',
-                                              'categories':'accessories',
-                                              'subcat':AccessoriesScreen.accesscat,
-                                            });
-                                            getPhonesList();
-
-
-                                            Navigator.of(context).pop();
-                                          }),
-
-
-
-                                    ],
-                                  ),
-                                ),
-                              );
-                            });
-
-
-                      })
-                ],
-                title: Text(
-                  AccessoriesScreen.accesscat,
-                  style: TextStyle(color: Colors.black),
-                ),
-                backgroundColor: Colors.white,
-                leading: new IconButton(
-                  icon: new Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          child: Column(
-                            children: <Widget>[
-                              Expanded(
-                                child: Container(
-                                  child: CachedNetworkImage(
-                                    imageUrl: ListOfPhones[index]['image'],
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                ListOfPhones[index]['phonename'],
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              Text(
-                                '${ListOfPhones[index]['price'].toString()} \$',
-                                style:
-                                TextStyle(fontSize: 16, color: Colors.green),
-                              ),
-                              FutureBuilder(
-                                  builder: (BuildContext context,
-                                      AsyncSnapshot<int> qttnumbr) {
-                                    return Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                        onPressed:(){
+                      var nn=1.0;
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  content: Form(
+                                    child: ModalProgressHUD(
+                                      inAsyncCall: _save,
+                                      dismissible: true,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
-                                          Text('Available:'),
-                                          Text(
-                                            '${qttnumbr.data}',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.blueAccent),
+                                          MaterialButton(
+                                            onPressed: (){
+                                              setState(() {
+
+                                                uploadPic();
+                                              },);
+                                            },
+                                            child: Text(upload),
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  initialData: 1,
-                                  future:
-                                  getqtt(ListOfPhones[index]['phonename'])),
-                              MaterialButton(
-                                child: Text(
-                                  'Sell',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.blueAccent,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  var _n = -1;
-                                  var _price = 0.0;
-                                  var currency = 'L.L';
-                                  showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
 
-                                          content: Form(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: <Widget>[
-                                                Expanded(
-                                                  child: Container(
-                                                    child: CachedNetworkImage(
-                                                      imageUrl:
-                                                      ListOfPhones[index]
-                                                      ['image'],
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  ListOfPhones[index]
-                                                  ['phonename'],
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                      FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  '${ListOfPhones[index]['price'].toString()} \$',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.green),
-                                                ),
-                                                FutureBuilder(
-                                                    builder:
-                                                        (BuildContext context,
-                                                        AsyncSnapshot<int>
-                                                        qttnumbr) {
-                                                      return Center(
-                                                        child: Text(
-                                                          'Available : ${qttnumbr.data}',
-                                                        ),
-                                                      );
-                                                    },
-                                                    initialData: 1,
-                                                    future: getqtt(
-                                                        ListOfPhones[index]
-                                                        ['phonename'])),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      left: 40, right: 40,top: 10),
-                                                  child: TextField(
-                                                    keyboardType: TextInputType
-                                                        .emailAddress,
-                                                    textAlign: TextAlign.center,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        _n = -(int.parse(value));
-                                                      });
-                                                    },
-                                                    decoration:
-                                                    KTextFieldImputDecoration
-                                                        .copyWith(
-                                                        hintText:
-                                                        'Enter Your Qtt'),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      left: 40, right: 40,top: 10),
-                                                  child: TextField(
-                                                    keyboardType: TextInputType
-                                                        .emailAddress,
-                                                    textAlign: TextAlign.center,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        _price =
-                                                        (double.parse(value));
-                                                      });
-                                                    },
-                                                    decoration:
-                                                    KTextFieldImputDecoration
-                                                        .copyWith(
-                                                        hintText:
-                                                        'Enter Your Price'),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.all(8.0),
-                                                  child: CustomRadioButton(
-                                                    buttonColor: Theme.of(context)
-                                                        .canvasColor,
-                                                    buttonLables: [
-                                                      'L.L',
-                                                      '\$',
-                                                    ],
-                                                    buttonValues: [
-
-                                                      'L.L',
-                                                      '\$',
-                                                    ],
-                                                    radioButtonValue: (value) {
-                                                      setState(() {
-                                                        currency = value;
-                                                      });
-                                                    },
-                                                    selectedColor: Theme.of(context)
-                                                        .accentColor,
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding: const EdgeInsets.only(
-                                                      top: 10, bottom: 10),
-                                                  child: MaterialButton(
-                                                    child: Text('Sell',style: TextStyle(fontSize: 30,color: Colors.blueAccent,fontWeight: FontWeight.bold),),
-                                                    onPressed: () {
-                                                      _firestore
-                                                          .collection(
-                                                          'transaction')
-                                                          .add({
-                                                        'name':
-                                                        ListOfPhones[index]['phonename'],
-                                                        'qtt': _n,
-                                                        'price': _price,
-                                                        'timestamp':
-                                                        DateTime.now(),
-                                                        'currency': currency,
-                                                      });
-                                                      setState(() {
-                                                        getqtt(ListOfPhones[index]['phonename']);
-                                                      });
-                                                      Navigator.of(context).pop();
-                                                    },
-                                                  ),
-                                                ),
-                                              ],
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, right: 10,top: 10),
+                                            child: TextField(
+                                              keyboardType: TextInputType
+                                                  .emailAddress,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  nameOfItem = value;
+                                                });
+                                              },
+                                              decoration:
+                                              KTextFieldImputDecoration
+                                                  .copyWith(
+                                                  hintText:
+                                                  'Enter the Name Of Item'),
                                             ),
                                           ),
-                                        );
-                                      });
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                    childCount: ListOfPhones.length,
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, right: 10,top: 10),
+                                            child: TextField(
+                                              keyboardType: TextInputType
+                                                  .emailAddress,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  PriceOfItem =
+                                                      value;
+                                                });
+                                              },
+                                              decoration:
+                                              KTextFieldImputDecoration
+                                                  .copyWith(
+                                                  hintText:
+                                                  'Enter the Price Of Item in \$'),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, right: 10,top: 10),
+                                            child: TextField(
+                                              keyboardType: TextInputType
+                                                  .emailAddress,
+                                              textAlign: TextAlign.center,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  nn =
+                                                  (double.parse(value));
+                                                });
+                                              },
+                                              decoration:
+                                              KTextFieldImputDecoration
+                                                  .copyWith(
+                                                  hintText:
+                                                  'Enter the Qtt'),
+                                            ),
+                                          ),
+                                          MaterialButton(
+                                              child: Text('Add',style: TextStyle(fontSize: 30,color: Colors.blueAccent),),
+                                              onPressed: (){
+                                                _firestore.collection('accessories').add({
+                                                  'phonename':nameOfItem,
+                                                  'price': PriceOfItem,
+                                                  'image': ImageLink,
+                                                  'INOUT': 'out',
+                                                  'categories':'accessories',
+                                                  'subcat':AccessoriesScreen.accesscat,
+                                                });
+                                                _firestore.collection('transaction').add({
+                                                  'name':nameOfItem ,
+                                                  'categorie': 'accessories',
+                                                  'inout': 'in',
+                                                  'qtt': nn,
+                                                });
+                                                getPhonesList();
+                                                setState(() {
+                                                  upload='choose your image';
+                                                });
+
+
+                                                Navigator.of(context).pop();
+                                              }),
+
+
+
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              });
+
+
+                        })
+                  ],
+                  title: Text(
+                    AccessoriesScreen.accesscat,
+                    style: TextStyle(color: Colors.black),
                   ),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    ///no.of items in the horizontal axis
-                    crossAxisCount: 2,
-                  ))
-            ],
+                  backgroundColor: Colors.white,
+                  leading: new IconButton(
+                    icon: new Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Card(
+                            elevation: 20,
+                            child: Container(
+                              child: Column(
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Container(
+                                      child: CachedNetworkImage(
+                                        imageUrl: ListOfPhones[index]['image'],
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    ListOfPhones[index]['phonename'],
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                  Text(
+                                    '${ListOfPhones[index]['price'].toString()} \$',
+                                    style:
+                                    TextStyle(fontSize: 16, color: Colors.green),
+                                  ),
+                                  FutureBuilder(
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<double> qttnumbr) {
+                                        return Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: <Widget>[
+                                              Text('Available:'),
+                                              Text(
+                                                '${qttnumbr.data}',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.blueAccent),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                      initialData: 1.0,
+                                      future:
+                                      getqtt(ListOfPhones[index]['phonename'])),
+                                  MaterialButton(
+                                    child: Text(
+                                      'Sell',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      var _n = -1;
+                                      var _price = 0.0;
+                                      var currency = 'L.L';
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+
+                                              content: Form(
+                                                child: Column(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: <Widget>[
+                                                    Expanded(
+                                                      child: Container(
+                                                        child: CachedNetworkImage(
+                                                          imageUrl:
+                                                          ListOfPhones[index]
+                                                          ['image'],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      ListOfPhones[index]
+                                                      ['phonename'],
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                          FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      '${ListOfPhones[index]['price'].toString()} \$',
+                                                      style: TextStyle(
+                                                          fontSize: 20,
+                                                          fontWeight: FontWeight.bold,
+                                                          color: Colors.green),
+                                                    ),
+                                                    FutureBuilder(
+                                                        builder:
+                                                            (BuildContext context,
+                                                            AsyncSnapshot<double>
+                                                            qttnumbr) {
+                                                          return Center(
+                                                            child: Text(
+                                                              'Available : ${qttnumbr.data}',
+                                                            ),
+                                                          );
+                                                        },
+                                                        initialData: 1.0,
+                                                        future: getqtt(
+                                                            ListOfPhones[index]
+                                                            ['phonename'])),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(
+                                                          left: 40, right: 40,top: 10),
+                                                      child: TextField(
+                                                        keyboardType: TextInputType
+                                                            .emailAddress,
+                                                        textAlign: TextAlign.center,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            _n = -(int.parse(value));
+                                                          });
+                                                        },
+                                                        decoration:
+                                                        KTextFieldImputDecoration
+                                                            .copyWith(
+                                                            hintText:
+                                                            'Enter Your Qtt'),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(
+                                                          left: 40, right: 40,top: 10),
+                                                      child: TextField(
+                                                        keyboardType: TextInputType
+                                                            .emailAddress,
+                                                        textAlign: TextAlign.center,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            _price =
+                                                            (double.parse(value));
+                                                          });
+                                                        },
+                                                        decoration:
+                                                        KTextFieldImputDecoration
+                                                            .copyWith(
+                                                            hintText:
+                                                            'Enter Your Price'),
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: CustomRadioButton(
+                                                        buttonColor: Theme.of(context)
+                                                            .canvasColor,
+                                                        buttonLables: [
+                                                          'L.L',
+                                                          '\$',
+                                                        ],
+                                                        buttonValues: [
+
+                                                          'L.L',
+                                                          '\$',
+                                                        ],
+                                                        radioButtonValue: (value) {
+                                                          setState(() {
+                                                            currency = value;
+                                                          });
+                                                        },
+                                                        selectedColor: Theme.of(context)
+                                                            .accentColor,
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(
+                                                          top: 10, bottom: 10),
+                                                      child: MaterialButton(
+                                                        child: Text('Sell',style: TextStyle(fontSize: 30,color: Colors.blueAccent,fontWeight: FontWeight.bold),),
+                                                        onPressed: () {
+                                                          _firestore
+                                                              .collection(
+                                                              'transaction')
+                                                              .add({
+                                                            'name':
+                                                            ListOfPhones[index]['phonename'],
+                                                            'qtt': _n,
+                                                            'price': _price,
+                                                            'timestamp':
+                                                            DateTime.now(),
+                                                            'currency': currency,
+                                                          });
+                                                          setState(() {
+                                                            getqtt(ListOfPhones[index]['phonename']);
+                                                          });
+                                                          Navigator.of(context).pop();
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          });
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      childCount: ListOfPhones.length,
+                    ),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      ///no.of items in the horizontal axis
+                      crossAxisCount: 2,
+                    ))
+              ],
+            ),
           ),
         ),
       ),

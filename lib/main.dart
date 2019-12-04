@@ -14,6 +14,8 @@ import 'clientsScreen.dart';
 import 'phonecategories.dart';
 import 'phonecat.dart';
 import 'accessoriescat.dart';
+import 'EditItems.dart';
+import 'OthersScreen.dart';
 void main() => runApp(phone_sotre());
 
 class phone_sotre extends StatefulWidget {
@@ -42,6 +44,8 @@ class _phone_sotreState extends State<phone_sotre> {
         phonecategories.id:(context) =>phonecategories(),
         phonecat.id:(context) =>phonecat(),
         accesscat.id:(context) =>accesscat(),
+        EditItems.id:(context) =>EditItems(),
+        OtherScrenn.id:(context) =>OtherScrenn(),
       },
     );
   }

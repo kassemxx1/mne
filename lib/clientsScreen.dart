@@ -318,9 +318,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
         ],
         title: new Text(
           'Clients',
-          style: TextStyle(color: Colors.black),
+          style: TextStyle(color: Colors.yellow),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black54,
         leading: new IconButton(
           icon: new Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
@@ -329,652 +329,672 @@ class _ClientsScreenState extends State<ClientsScreen> {
       body: ModalProgressHUD(
         inAsyncCall: _saving,
         dismissible: true,
-        child: ListView(
-          children: <Widget>[
-            textField,
-            Center(
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      mytext,
-                      style: TextStyle(fontSize: 25, color: Colors.blue),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FutureBuilder(
-                        builder: (BuildContext context,
-                            AsyncSnapshot<double> qttnumbr) {
-                          return Center(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Debt:',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.grey),
-                                  ),
-                                ),
-                                Text(
-                                  '${qttnumbr.data.round()}',
-                                  style:
-                                      TextStyle(fontSize: 25, color: Colors.red),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        initialData: 0.0,
-                        future: getqtt(mytext)),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              child: DropDownFormField(
-                titleText: 'Select Categorie',
-                hintText: 'Please choose one',
-                value: categorieValue,
-                onSaved: (value) {
-                  setState(() {
-                    categorieValue = value;
-                    getcategories(value);
-                    _saving=false;
-                  });
-                  print(categorieValue);
-                },
-                onChanged: (value) {
-                  setState(() {
-                    categorieValue = value;
-                    getcategories(value);
-                    _saving=false;
-                  });
-                },
-                dataSource: catlist,
-                textField: 'display',
-                valueField: 'value',
-              ),
-            ),
-            Container(
-              child: DropDownFormField(
-                titleText: 'Select Item',
-                hintText: 'Please choose one',
-                value: itemValue,
-                onSaved: (value) {
-                  setState(() {
-                    itemValue = value;
-                  });
-                },
-                onChanged: (value) {
-                  setState(() {
-                    itemValue = value;
-                  });
-                },
-                dataSource: ListOfItems,
-                textField: 'display',
-                valueField: 'value',
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
-              child: TextField(
-                controller: _textEditingController1,
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.center,
-                onChanged: (value) {
-                  setState(() {
-                    qtt = (double.parse(value));
-                  });
-                },
-                decoration: KTextFieldImputDecoration.copyWith(
-                    hintText: 'Enter Your Qtt'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
-              child: TextField(
-                controller: _textEditingController2,
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.center,
-                onChanged: (value) {
-                  setState(() {
-                    debt = (double.parse(value));
-                  });
-                },
-                decoration: KTextFieldImputDecoration.copyWith(hintText: 'Debt'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
-              child: TextField(
-                controller: _textEditingController3,
-                keyboardType: TextInputType.emailAddress,
-                textAlign: TextAlign.center,
-                onChanged: (value) {
-                  setState(() {
-                    DebtAnalysis = (double.parse(value));
-                  });
-                },
-                decoration:
-                    KTextFieldImputDecoration.copyWith(hintText: 'Debt analysis'),
-              ),
-            ),
-            Center(
-              child: MaterialButton(
-                onPressed: () {
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Are You Sure?'),
-                          actions: <Widget>[
-                            MaterialButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text('cancel'),
-                            ),
-                            MaterialButton(
-                              onPressed: () {
-                                setState(() {
-                                  _saving=true;
-                                });
-                                if(DebtAnalysis==0){
-                                  _firestore.collection('clients').add({
-                                    'name': mytext,
-                                    'product': itemValue,
-                                    'qtt': qtt,
-                                    'debt': debt,
-                                    'den': -DebtAnalysis,
-                                    'timestamp': Timestamp.now(),
-                                    'currnecy': 'L.L',
-                                  });
-                                  _firestore.collection('transaction').add({
-                                    'name': mytext,
-                                    'price': 0,
-                                    'qtt': qtt,
-                                    'timestamp': Timestamp.now(),
-                                    'currnecy': 'L.L',
-                                  });
-                                }
-                                else{
-                                  _firestore.collection('clients').add({
-                                    'name': mytext,
-                                    'product': itemValue,
-                                    'qtt': qtt,
-                                    'debt': debt,
-                                    'den': -DebtAnalysis,
-                                    'timestamp': Timestamp.now(),
-                                    'currnecy': 'L.L',
-                                  });
-
-                                }
-
-
-                                setState(() {
-                                  qtt = 1.0;
-                                  debt = 0.0;
-                                  DebtAnalysis = 0.0;
-                                  _saving=false;
-                                });
-
-                                _textEditingController1.clear();
-                                _textEditingController2.clear();
-                                _textEditingController3.clear();
-
-                                Navigator.of(context).pop();
-                                gettransactiondate(mytext);
-                              },
-                              child: Text('Yes'),
-                            ),
-                          ],
-                        );
-                      });
-                },
-                child: Text(
-                  'Send',
-                  style: TextStyle(color: Colors.blue, fontSize: 30),
-                ),
-              ),
-            ),
-            MaterialButton(
-              onPressed: () {
-                gettransactiondate(mytext);
-                print(transaction);
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10.0))),
-                        content: Scaffold(
-                          appBar: AppBar(
-                            title: Text(
-                              mytext.toString(),
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            backgroundColor: Colors.white,
-                          ),
-                          body: Container(
-                            child: new ListView.builder(
-                                itemCount: transaction.length,
-                                itemBuilder: (BuildContext cntxt, int index) {
-                                  return Dismissible(
-                                    background: Material(
-                                      color: Colors.red,
-                                    ),
-                                    onDismissed:
-                                        (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                      await _firestore
-                                          .collection('clients')
-                                          .document('${transaction[index]['id']}')
-                                          .delete();
-                                      gettransactiondate(mytext);
-                                      transaction.remove(transaction[index]);
-                                    },
-                                    key: Key(transaction[index].toString()),
-                                    child: Card(
-                                      child: ListTile(
-                                        title: Text(
-                                          '${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [
-                                            yyyy,
-                                            '-',
-                                            mm,
-                                            '-',
-                                            dd
-                                          ])}',
-                                          style: TextStyle(
-                                              color: Colors.grey, fontSize: 12),
-                                        ),
-                                        subtitle: Row(
-                                          children: <Widget>[
-                                            Flexible(
-                                              child: Container(
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['debt'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['den']}',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                width: 70,
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['product'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ),
-                      );
-                    });
-              },
-              child: Text(
-                'Client Report',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            MaterialButton(
-              onPressed: () {
-                setState(() {
-                  gettransaction(today,tomorow);
-                });
-
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0))),
-                        content: Scaffold(
-
-                          body: Container(
-                            child: new ListView.builder(
-                                itemCount: transaction.length,
-                                itemBuilder: (BuildContext cntxt, int index) {
-                                  return Dismissible(
-                                    background: Material(
-                                      color: Colors.red,
-                                    ),
-                                    onDismissed:
-                                        (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                      await _firestore
-                                          .collection('clients')
-                                          .document('${transaction[index]['id']}')
-                                          .delete();
-                                      gettransaction(today,tomorow);
-                                      transaction.remove(transaction[index]);
-                                    },
-                                    key: Key(transaction[index].toString()),
-                                    child: Card(
-                                      child: ListTile(
-                                        title: Text(
-                                          transaction[index]['name'],
-                                        ),
-                                        subtitle: Row(
-                                          children: <Widget>[
-                                            Flexible(
-                                              child: Container(
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['debt'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['den']}',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                width: 70,
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['product'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontSize: 10),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                }),
-                          ),
-                        ),
-                      );
-                    });
-              },
-              child: Text(
-                'Daily Report',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
+        child: Container(
+          color: Colors.black54,
+          child: ListView(
+            children: <Widget>[
+              textField,
+              Center(
                 child: Row(
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Text('start Date:'),
-                        FlatButton(
-                            onPressed: () {
-                              DatePicker.showDatePicker(context,
-                                  showTitleActions: true,
-                                  minTime: DateTime(2019, 1, 1),
-                                  maxTime: DateTime(2025, 6, 7), onChanged: (date) {
-
-                                  }, onConfirm: (date) {
-                                    setState(() {
-                                      startDate =date;
-                                    });
-
-
-
-                                    print(startDate);
-                                  }, currentTime: DateTime.now(), locale: LocaleType.en);
-                            },
-                            child: Text(
-                              '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
-                              style: TextStyle(color: Colors.blue,fontSize: 11),
-                            )),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        mytext,
+                        style: TextStyle(fontSize: 25, color: Colors.yellow),
+                      ),
                     ),
-                    Row(
-                      children: <Widget>[
-                        Text('End Date:'),
-                        FlatButton(
-                            onPressed: () {
-                              DatePicker.showDatePicker(context,
-                                  showTitleActions: true,
-                                  minTime: DateTime(2019, 1, 1),
-                                  maxTime: DateTime(2025, 6, 7), onChanged: (date) {
-
-                                  }, onConfirm: (date) {
-                                    setState(() {
-                                      endDate =date.add(new Duration(hours: 23,minutes: 59,seconds: 59));
-                                    });
-
-
-
-
-                                  }, currentTime: DateTime.now(), locale: LocaleType.en);
-                            },
-                            child: Text(
-                              '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
-                              style: TextStyle(color: Colors.blue,fontSize: 11),
-                            )),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FutureBuilder(
+                          builder: (BuildContext context,
+                              AsyncSnapshot<double> qttnumbr) {
+                            return Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Debt:',
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.yellow),
+                                    ),
+                                  ),
+                                  Text(
+                                    '${qttnumbr.data.round()}',
+                                    style:
+                                        TextStyle(fontSize: 25, color: Colors.blue),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          initialData: 0.0,
+                          future: getqtt(mytext)),
                     ),
                   ],
                 ),
               ),
-            ),
-            MaterialButton(
-              onPressed: () {
-                setState(() {
-                  gettransaction(startDate,endDate);
-                });
+              Container(
+                child: DropDownFormField(
+                  titleText: 'Select Categorie',
+                  hintText: 'Please choose one',
+                  value: categorieValue,
+                  onSaved: (value) {
+                    setState(() {
+                      categorieValue = value;
+                      getcategories(value);
+                      _saving=false;
+                    });
+                    print(categorieValue);
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      categorieValue = value;
+                      getcategories(value);
+                      _saving=false;
+                    });
+                  },
+                  dataSource: catlist,
+                  textField: 'display',
+                  valueField: 'value',
+                ),
+              ),
+              Container(
+                child: DropDownFormField(
+                  titleText: 'Select Item',
+                  hintText: 'Please choose one',
+                  value: itemValue,
+                  onSaved: (value) {
+                    setState(() {
+                      itemValue = value;
+                    });
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      itemValue = value;
+                    });
+                  },
+                  dataSource: ListOfItems,
+                  textField: 'display',
+                  valueField: 'value',
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
+                child: TextField(
+                  controller: _textEditingController1,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  onChanged: (value) {
+                    setState(() {
+                      qtt = (double.parse(value));
+                    });
+                  },
+                  decoration: KTextFieldImputDecoration.copyWith(
+                      hintText: 'Enter Your Qtt'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
+                child: TextField(
+                  controller: _textEditingController2,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  onChanged: (value) {
+                    setState(() {
+                      debt = (double.parse(value));
+                    });
+                  },
+                  decoration: KTextFieldImputDecoration.copyWith(hintText: 'Debt'),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 40, right: 40, top: 10),
+                child: TextField(
+                  controller: _textEditingController3,
+                  keyboardType: TextInputType.emailAddress,
+                  textAlign: TextAlign.center,
+                  onChanged: (value) {
+                    setState(() {
+                      DebtAnalysis = (double.parse(value));
+                    });
+                  },
+                  decoration:
+                      KTextFieldImputDecoration.copyWith(hintText: 'Debt analysis'),
+                ),
+              ),
+              Center(
+                child: MaterialButton(
+                  onPressed: () {
+                    if(mytext==''){
 
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(10.0))),
-                        content: Scaffold(
+                    }
+                    else {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Are You Sure?'),
+                              actions: <Widget>[
+                                MaterialButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('cancel'),
+                                ),
+                                MaterialButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _saving = true;
+                                    });
+                                    if (DebtAnalysis == 0) {
+                                      _firestore.collection('clients').add({
+                                        'name': mytext,
+                                        'product': itemValue,
+                                        'qtt': qtt,
+                                        'debt': debt,
+                                        'den': -DebtAnalysis,
+                                        'timestamp': Timestamp.now(),
+                                        'currnecy': 'L.L',
+                                      });
+                                      _firestore.collection('transaction').add({
+                                        'name': mytext,
+                                        'price': 0,
+                                        'qtt': qtt,
+                                        'timestamp': Timestamp.now(),
+                                        'currnecy': 'L.L',
+                                      });
+                                    }
+                                    else {
+                                      _firestore.collection('clients').add({
+                                        'name': mytext,
+                                        'product': itemValue,
+                                        'qtt': qtt,
+                                        'debt': debt,
+                                        'den': -DebtAnalysis,
+                                        'timestamp': Timestamp.now(),
+                                        'currnecy': 'L.L',
+                                      });
+                                    }
 
-                          body: Container(
-                            child: new ListView.builder(
-                                itemCount: transaction.length,
-                                itemBuilder: (BuildContext cntxt, int index) {
-                                  return Dismissible(
-                                    background: Material(
-                                      color: Colors.red,
-                                    ),
-                                    onDismissed:
-                                        (DismissDirection direction) async {
+
+                                    setState(() {
+                                      qtt = 1.0;
+                                      debt = 0.0;
+                                      DebtAnalysis = 0.0;
+                                      _saving = false;
+                                    });
+
+                                    _textEditingController1.clear();
+                                    _textEditingController2.clear();
+                                    _textEditingController3.clear();
+
+                                    Navigator.of(context).pop();
+                                    gettransactiondate(mytext);
+                                  },
+                                  child: Text('Yes'),
+                                ),
+                              ],
+                            );
+                          });
+                    }
+                  },
+                  child: Text(
+                    'Send',
+                    style: TextStyle(color: Colors.yellow, fontSize: 30),
+                  ),
+                ),
+              ),
+              MaterialButton(
+                onPressed: () {
+                  gettransactiondate(mytext);
+                  print(transaction);
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10.0))),
+                          content: Scaffold(
+                            appBar: AppBar(
+                              title: Text(
+                                mytext.toString(),
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              backgroundColor: Colors.white,
+                            ),
+                            body: Container(
+                              child: new ListView.builder(
+                                  itemCount: transaction.length,
+                                  itemBuilder: (BuildContext cntxt, int index) {
+                                    return Dismissible(
+                                      background: Material(
+                                        color: Colors.red,
+                                      ),
+                                      onDismissed:
+                                          (DismissDirection direction) async {
 //                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
 //                                      for (DocumentSnapshot ds in snapshot.documents){
 //                                        ds.reference.delete();
 //                                      });
 //                                    }
 
-                                      await _firestore
-                                          .collection('clients')
-                                          .document('${transaction[index]['id']}')
-                                          .delete();
-                                      gettransaction(today,tomorow);
-                                      transaction.remove(transaction[index]);
-                                    },
-                                    key: Key(transaction[index].toString()),
-                                    child: Card(
-                                      child: ListTile(
-                                        title: Text(
-                                          '${transaction[index]['name']}  ${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),
-                                        ),
-                                        subtitle: Row(
-                                          children: <Widget>[
-                                            Flexible(
-                                              child: Container(
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['debt'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontSize: 10),
+                                        await _firestore
+                                            .collection('clients')
+                                            .document('${transaction[index]['id']}')
+                                            .delete();
+                                        gettransactiondate(mytext);
+                                        transaction.remove(transaction[index]);
+                                      },
+                                      key: Key(transaction[index].toString()),
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(
+                                            '${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [
+                                              yyyy,
+                                              '-',
+                                              mm,
+                                              '-',
+                                              dd
+                                            ])}',
+                                            style: TextStyle(
+                                                color: Colors.grey, fontSize: 12),
+                                          ),
+                                          subtitle: Row(
+                                            children: <Widget>[
+                                              Flexible(
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['debt'].toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontSize: 10),
+                                                    ),
                                                   ),
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                              ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                width: 70,
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['den']}',
-                                                    style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 10),
-                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 70,
                                                 ),
                                               ),
-                                            ),
-                                            Flexible(
-                                              child: Container(
-                                                width: 70,
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color: Colors.black)),
-                                                child: Padding(
-                                                  padding:
-                                                  const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    '${transaction[index]['product'].toString()}',
-                                                    style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontSize: 10),
+                                              Flexible(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 70,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['den']}',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: 10),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              Flexible(
+                                                child: Container(
+                                                  width: 70,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['product'].toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.blueAccent,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                }),
+                                    );
+                                  }),
+                            ),
                           ),
-                        ),
-                      );
-                    });
-              },
-              child: Text(
-                'Transaction',
-                style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+                        );
+                      });
+                },
+                child: Text(
+                  'Client Report',
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-          ],
+              MaterialButton(
+                onPressed: () {
+                  setState(() {
+                    gettransaction(today,tomorow);
+                  });
+
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
+                          content: Scaffold(
+
+                            body: Container(
+                              child: new ListView.builder(
+                                  itemCount: transaction.length,
+                                  itemBuilder: (BuildContext cntxt, int index) {
+                                    return Dismissible(
+                                      background: Material(
+                                        color: Colors.red,
+                                      ),
+                                      onDismissed:
+                                          (DismissDirection direction) async {
+//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
+//                                      for (DocumentSnapshot ds in snapshot.documents){
+//                                        ds.reference.delete();
+//                                      });
+//                                    }
+
+                                        await _firestore
+                                            .collection('clients')
+                                            .document('${transaction[index]['id']}')
+                                            .delete();
+                                        gettransaction(today,tomorow);
+                                        transaction.remove(transaction[index]);
+                                      },
+                                      key: Key(transaction[index].toString()),
+                                      child: Card(
+                                        child: ListTile(
+                                          title: Text(
+                                            transaction[index]['name'],
+                                          ),
+                                          subtitle: Row(
+                                            children: <Widget>[
+                                              Flexible(
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['debt'].toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 70,
+                                                ),
+                                              ),
+                                              Flexible(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  width: 70,
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['den']}',
+                                                      style: TextStyle(
+                                                          color: Colors.red,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Flexible(
+                                                child: Container(
+                                                  width: 70,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: Colors.black)),
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets.all(8.0),
+                                                    child: Text(
+                                                      '${transaction[index]['product'].toString()}',
+                                                      style: TextStyle(
+                                                          color: Colors.blueAccent,
+                                                          fontSize: 10),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                          ),
+                        );
+                      });
+                },
+                child: Text(
+                  'Daily Report',
+                  style: TextStyle(
+                    color: Colors.yellow,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Card(
+                color: Colors.yellow,
+                child: Column(
+                  children: <Widget>[
+                    Center(child: Text('Transaction Report',style: TextStyle(color: Colors.black54),)),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Row(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text('start Date:'),
+                                FlatButton(
+                                    onPressed: () {
+                                      DatePicker.showDatePicker(context,
+                                          showTitleActions: true,
+                                          minTime: DateTime(2019, 1, 1),
+                                          maxTime: DateTime(2025, 6, 7), onChanged: (date) {
+
+                                          }, onConfirm: (date) {
+                                            setState(() {
+                                              startDate =date;
+                                            });
+
+
+
+                                            print(startDate);
+                                          }, currentTime: DateTime.now(), locale: LocaleType.en);
+                                    },
+                                    child: Text(
+                                      '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
+                                      style: TextStyle(color: Colors.blue,fontSize: 15),
+                                    )),
+                              ],
+                            ),
+                            Row(
+                              children: <Widget>[
+                                Text('End Date:'),
+                                FlatButton(
+                                    onPressed: () {
+                                      DatePicker.showDatePicker(context,
+                                          showTitleActions: true,
+                                          minTime: DateTime(2019, 1, 1),
+                                          maxTime: DateTime(2025, 6, 7), onChanged: (date) {
+
+                                          }, onConfirm: (date) {
+                                            setState(() {
+                                              endDate =date.add(new Duration(hours: 23,minutes: 59,seconds: 59));
+                                            });
+
+
+
+
+                                          }, currentTime: DateTime.now(), locale: LocaleType.en);
+                                    },
+                                    child: Text(
+                                      '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
+                                      style: TextStyle(color: Colors.blue,fontSize: 15),
+                                    )),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    MaterialButton(
+                      onPressed: () {
+                        setState(() {
+                          gettransaction(startDate,endDate);
+                        });
+
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(10.0))),
+                                content: Scaffold(
+
+                                  body: Container(
+                                    child: new ListView.builder(
+                                        itemCount: transaction.length,
+                                        itemBuilder: (BuildContext cntxt, int index) {
+                                          return Dismissible(
+                                            background: Material(
+                                              color: Colors.red,
+                                            ),
+                                            onDismissed:
+                                                (DismissDirection direction) async {
+//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
+//                                      for (DocumentSnapshot ds in snapshot.documents){
+//                                        ds.reference.delete();
+//                                      });
+//                                    }
+
+                                              await _firestore
+                                                  .collection('clients')
+                                                  .document('${transaction[index]['id']}')
+                                                  .delete();
+                                              gettransaction(today,tomorow);
+                                              transaction.remove(transaction[index]);
+                                            },
+                                            key: Key(transaction[index].toString()),
+                                            child: Card(
+                                              child: ListTile(
+                                                title: Text(
+                                                  '${transaction[index]['name']}  ${formatDate(DateTime.parse(transaction[index]['time'].toDate().toString()), [yyyy, '-', mm, '-', dd])}',style: TextStyle(color: Colors.grey,fontSize: 12),
+                                                ),
+                                                subtitle: Row(
+                                                  children: <Widget>[
+                                                    Flexible(
+                                                      child: Container(
+                                                        child: Padding(
+                                                          padding:
+                                                          const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            '${transaction[index]['debt'].toString()}',
+                                                            style: TextStyle(
+                                                                color: Colors.green,
+                                                                fontSize: 10),
+                                                          ),
+                                                        ),
+                                                        decoration: BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Colors.black)),
+                                                        width: 70,
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Container(
+                                                        decoration: BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Colors.black)),
+                                                        width: 70,
+                                                        child: Padding(
+                                                          padding:
+                                                          const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            '${transaction[index]['den']}',
+                                                            style: TextStyle(
+                                                                color: Colors.red,
+                                                                fontSize: 10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Flexible(
+                                                      child: Container(
+                                                        width: 70,
+                                                        decoration: BoxDecoration(
+                                                            border: Border.all(
+                                                                color: Colors.black)),
+                                                        child: Padding(
+                                                          padding:
+                                                          const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            '${transaction[index]['product'].toString()}',
+                                                            style: TextStyle(
+                                                                color: Colors.blueAccent,
+                                                                fontSize: 10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                ),
+                              );
+                            });
+                      },
+                      child: Text(
+                        'Transaction',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+
+
+                  ],
+
+                ),
+              ),
+
+            ],
+          ),
         ),
       ),
     );

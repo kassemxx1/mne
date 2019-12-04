@@ -34,19 +34,52 @@ class _InvoicesState extends State<Invoices> {
 
   void getcategories(String cat) async {
     ListOfItems.clear();
-    final Messages = await _firestore
-        .collection('phones')
-        .where('categories', isEqualTo: cat)
-        .getDocuments();
-    for (var msg in Messages.documents) {
-      final name = msg.data['phonename'].toString();
-      setState(() {
-        ListOfItems.add({
-          'display': '$name',
-          'value': '$name',
+    if(cat=='phones'){
+      final Messages = await _firestore
+          .collection('tele')
+          .where('categories', isEqualTo: cat)
+          .getDocuments();
+      for (var msg in Messages.documents) {
+        final name = msg.data['phonename'].toString();
+        setState(() {
+          ListOfItems.add({
+            'display': '$name',
+            'value': '$name',
+          });
         });
-      });
+      }
     }
+    if(cat=='accessories'){
+      final Messages = await _firestore
+          .collection('accessories')
+          .where('categories', isEqualTo: cat)
+          .getDocuments();
+      for (var msg in Messages.documents) {
+        final name = msg.data['phonename'].toString();
+        setState(() {
+          ListOfItems.add({
+            'display': '$name',
+            'value': '$name',
+          });
+        });
+      }
+    }
+    else{
+      final Messages = await _firestore
+          .collection('phones')
+          .where('categories', isEqualTo: cat)
+          .getDocuments();
+      for (var msg in Messages.documents) {
+        final name = msg.data['phonename'].toString();
+        setState(() {
+          ListOfItems.add({
+            'display': '$name',
+            'value': '$name',
+          });
+        });
+      }
+    }
+
   }
 
   @override
@@ -61,17 +94,7 @@ class _InvoicesState extends State<Invoices> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Enter Your Invoice',
-          style: TextStyle(color: Colors.black),
-        ),
-        backgroundColor: Colors.white,
-        leading: new IconButton(
-          icon: new Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      backgroundColor: Colors.black54,
       body: Container(
         child: ListView.builder(
           itemCount: listofInvoice.length + 5,
@@ -97,6 +120,7 @@ class _InvoicesState extends State<Invoices> {
                   dataSource: catlist,
                   textField: 'display',
                   valueField: 'value',
+
                 ),
               );
             }
@@ -144,10 +168,10 @@ class _InvoicesState extends State<Invoices> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Card(
-                    color: Colors.blueAccent,
+                    color: Colors.yellow,
                     child: Text(
                       'Add',
-                      style: TextStyle(color: Colors.white, fontSize: 35),
+                      style: TextStyle(color: Colors.black, fontSize: 35),
                     ),
                   ),
                 ),
@@ -165,7 +189,7 @@ class _InvoicesState extends State<Invoices> {
                       });
                       itemValue = '';
 
-                      qtt = 0;
+                      qtt = 0.0;
                       _textEditingController.clear();
                     });
                   }
@@ -177,10 +201,10 @@ class _InvoicesState extends State<Invoices> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Card(
-                    color: Colors.blueAccent,
+                    color: Colors.yellow,
                     child: Text(
                       'Send',
-                      style: TextStyle(color: Colors.white, fontSize: 35),
+                      style: TextStyle(color: Colors.black, fontSize: 35),
                     ),
                   ),
                 ),
@@ -236,7 +260,7 @@ class _InvoicesState extends State<Invoices> {
                             style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.green),
+                                color: Colors.yellow),
                           )))
                         ]),
                       ),

@@ -26,6 +26,8 @@ dependencies:
   date_format: ^1.0.8
   autocomplete_textfield: ^1.7.3
   modal_progress_hud: ^0.1.3
+  fancy_bottom_navigation: ^0.3.2
+
 
 dev_dependencies:
   flutter_test:
