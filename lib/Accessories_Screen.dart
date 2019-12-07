@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'constants.dart';
@@ -268,7 +267,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                           padding: const EdgeInsets.all(2.0),
                           child: GestureDetector(
                             onTap: (){
-                              var _n = -1;
+                              var _n = -1.0;
                               var _price = 0.0;
                               var currency = 'L.L';
                               showDialog(
@@ -328,7 +327,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                 textAlign: TextAlign.center,
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    _n = -(int.parse(value));
+                                                    _n = -(double.parse(value));
                                                   });
                                                 },
                                                 decoration:
@@ -457,7 +456,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                               ),
                                             );
                                           },
-                                          initialData: 1.0,
+                                          initialData: 0.0,
                                           future:
                                           getqtt(ListOfPhones[index]['phonename'])),
 

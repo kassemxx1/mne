@@ -297,7 +297,7 @@ class _PhonesListState extends State<PhonesList> {
                         (BuildContext context, int index) {
                           return GestureDetector(
                             onTap: (){
-                              var _n = -1;
+                              var _n = -1.0;
                               var _price = 0.0;
                               var currency = 'L.L';
                               showDialog(
@@ -364,7 +364,7 @@ class _PhonesListState extends State<PhonesList> {
                                                 textAlign: TextAlign.center,
                                                 onChanged: (value) {
                                                   setState(() {
-                                                    _n = -(int.parse(value));
+                                                    _n = -(double.parse(value));
                                                   });
                                                 },
                                                 decoration:

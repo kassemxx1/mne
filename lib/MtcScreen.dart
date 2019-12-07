@@ -170,7 +170,7 @@ class _MtcScreenState extends State<MtcScreen> {
                                         ),
                                       );
                                     },
-                                    initialData: 1.0,
+                                    initialData: 0.0,
                                     future:
                                         getqtt(ListOfPhones[index]['phonename'])),
                                 MaterialButton(

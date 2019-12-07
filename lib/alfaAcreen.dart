@@ -171,7 +171,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                         ),
                                       );
                                     },
-                                    initialData: 1.0,
+                                    initialData: 0.0,
                                     future:
                                     getqtt(ListOfPhones[index]['phonename'])),
                                 MaterialButton(

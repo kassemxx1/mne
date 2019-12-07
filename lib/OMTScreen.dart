@@ -181,7 +181,7 @@ class _OMTScreenState extends State<OMTScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      color: Colors.yellow,
+                      color: Colors.white.withOpacity(0.0),
                       elevation: 20,
                       child: Column(
                         children: <Widget>[
@@ -234,7 +234,8 @@ class _OMTScreenState extends State<OMTScreen> {
                               );
                             },
                             child: Text('Enter Opening Balance', style: TextStyle(
-                              color: Colors.black, fontSize: 20,),),
+                              color: Colors.yellow, fontSize: 20,),),
+                            color: Colors.black54,
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -254,7 +255,7 @@ class _OMTScreenState extends State<OMTScreen> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: CustomRadioButton(
-                      buttonColor: Colors.yellow,
+                      buttonColor: Colors.black54,
                       buttonLables: [
 
                         'L.L.',
@@ -270,7 +271,7 @@ class _OMTScreenState extends State<OMTScreen> {
                           currency = value;
                         });
                       },
-                      selectedColor:Colors.black54,
+                      selectedColor:Colors.yellow,
                     ),
                   ),
                   Padding(
@@ -303,155 +304,165 @@ class _OMTScreenState extends State<OMTScreen> {
                     ),
                   ),
 
-                  RoundedButton(
-                    title: 'Send',
-                    colour: Colors.black54,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MaterialButton(
+                      child: Text('Send',style: TextStyle(color: Colors.yellow,fontSize: 20,fontWeight: FontWeight.bold),),
+                      color: Colors.black54,
 
-                    onPressed: () async {
-                      setState(() {
-                        _saving=true;
-                      });
-                      await _firestore.collection('omt').add({
-                        'in': IN,
-                        'out': out,
-                        'timestamp': Timestamp.now(),
-                        'currency': currency,
-                      });
-                      _textEditingController1.clear();
-                      _textEditingController2.clear();
-                      setState(() {
-                        out = 0.0;
-                        IN = 0.0;
-                      });
-                      getqtt('in', startDate, 'L.L.');
-                      getqtt('in', startDate, '\$');
-                      gettransaction();
-                      FocusScope.of(context).unfocus();
-                    },
 
+                      onPressed: () async {
+                        setState(() {
+                          _saving=true;
+                        });
+                        await _firestore.collection('omt').add({
+                          'in': IN,
+                          'out': out,
+                          'timestamp': Timestamp.now(),
+                          'currency': currency,
+                        });
+                        _textEditingController1.clear();
+                        _textEditingController2.clear();
+                        setState(() {
+                          out = 0.0;
+                          IN = 0.0;
+                        });
+                        getqtt('in', startDate, 'L.L.');
+                        getqtt('in', startDate, '\$');
+                        gettransaction();
+                        FocusScope.of(context).unfocus();
+                      },
+
+                    ),
                   ),
-                  Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FutureBuilder(
-                                  builder:
-                                      (BuildContext context, AsyncSnapshot<
-                                      double> qttnumbr) {
-                                    return Center(
-                                      child: Text(
-                                        'In  : ${qttnumbr.data.round()} L.L',
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 18),
-                                      ),
-                                    );
-                                  },
-                                  initialData: 1.0,
-                                  future: getqtt('in', startDate, 'L.L.')),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FutureBuilder(
-                                  builder:
-                                      (BuildContext context, AsyncSnapshot<
-                                      double> qttnumbr) {
-                                    return Center(
-                                      child: Text(
-                                        'Out  : ${qttnumbr.data.round()} L.L',
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 18),
-                                      ),
-                                    );
-                                  },
-                                  initialData: 1.0,
-                                  future: getqtt('out', startDate, 'L.L.')),
-                            ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      color: Colors.white.withOpacity(0.0),
+                      elevation: 20,
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FutureBuilder(
+                                    builder:
+                                        (BuildContext context, AsyncSnapshot<
+                                        double> qttnumbr) {
+                                      return Center(
+                                        child: Text(
+                                          'In  : ${qttnumbr.data.round()} L.L',
+                                          style: TextStyle(
+                                              color: Colors.black, fontSize: 18),
+                                        ),
+                                      );
+                                    },
+                                    initialData: 1.0,
+                                    future: getqtt('in', startDate, 'L.L.')),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FutureBuilder(
+                                    builder:
+                                        (BuildContext context, AsyncSnapshot<
+                                        double> qttnumbr) {
+                                      return Center(
+                                        child: Text(
+                                          'Out  : ${qttnumbr.data.round()} L.L',
+                                          style: TextStyle(
+                                              color: Colors.black, fontSize: 18),
+                                        ),
+                                      );
+                                    },
+                                    initialData: 1.0,
+                                    future: getqtt('out', startDate, 'L.L.')),
+                              ),
 
-                          ],
-                        ),
-                        FutureBuilder(
-                            builder:
-                                (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Text(
-                                  'Tolal  : ${qttnumbr.data.round() } L.L',
-                                  style: TextStyle(color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                ),
-                              );
-                            },
-                            initialData: 1.0,
-                            future: getsum(startDate, 'L.L.')),
-                      ],
+                            ],
+                          ),
+                          FutureBuilder(
+                              builder:
+                                  (BuildContext context, AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Text(
+                                    'Tolal  : ${qttnumbr.data.round() } L.L',
+                                    style: TextStyle(color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                );
+                              },
+                              initialData: 1.0,
+                              future: getsum(startDate, 'L.L.')),
+                        ],
+                      ),
                     ),
                   ),
 
 
                   SizedBox(height: 20,),
-                  Card(
-                    color: Colors.yellow,
-                    elevation: 20,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FutureBuilder(
-                                  builder:
-                                      (BuildContext context, AsyncSnapshot<
-                                      double> qttnumbr) {
-                                    return Center(
-                                      child: Text(
-                                        'In  : ${qttnumbr.data} \$', style: TextStyle(
-                                          color: Colors.black, fontSize: 18),
-                                      ),
-                                    );
-                                  },
-                                  initialData: 1.0,
-                                  future: getqtt('in', startDate, '\$')),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: FutureBuilder(
-                                  builder:
-                                      (BuildContext context, AsyncSnapshot<
-                                      double> qttnumbr) {
-                                    return Center(
-                                      child: Text(
-                                        'Out  : ${qttnumbr.data} \$', style: TextStyle(
-                                          color: Colors.black, fontSize: 18),
-                                      ),
-                                    );
-                                  },
-                                  initialData: 1.0,
-                                  future: getqtt('out', startDate, '\$')),
-                            ),
-                          ],
-                        ),
-                        FutureBuilder(
-                            builder:
-                                (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Text(
-                                  'Tolal  : ${qttnumbr.data} \$',
-                                  style: TextStyle(color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                ),
-                              );
-                            },
-                            initialData: 1.0,
-                            future: getsum(startDate, '\$')),
-                      ],
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      color: Colors.white.withOpacity(0.0),
+                      elevation: 20,
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FutureBuilder(
+                                    builder:
+                                        (BuildContext context, AsyncSnapshot<
+                                        double> qttnumbr) {
+                                      return Center(
+                                        child: Text(
+                                          'In  : ${qttnumbr.data} \$', style: TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                        ),
+                                      );
+                                    },
+                                    initialData: 1.0,
+                                    future: getqtt('in', startDate, '\$')),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: FutureBuilder(
+                                    builder:
+                                        (BuildContext context, AsyncSnapshot<
+                                        double> qttnumbr) {
+                                      return Center(
+                                        child: Text(
+                                          'Out  : ${qttnumbr.data} \$', style: TextStyle(
+                                            color: Colors.black, fontSize: 18),
+                                        ),
+                                      );
+                                    },
+                                    initialData: 1.0,
+                                    future: getqtt('out', startDate, '\$')),
+                              ),
+                            ],
+                          ),
+                          FutureBuilder(
+                              builder:
+                                  (BuildContext context, AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Text(
+                                    'Tolal  : ${qttnumbr.data} \$',
+                                    style: TextStyle(color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20),
+                                  ),
+                                );
+                              },
+                              initialData: 1.0,
+                              future: getsum(startDate, '\$')),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -570,10 +581,11 @@ class _OMTScreenState extends State<OMTScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Center(
                       child: Card(
-                        color: Colors.yellow,
+                        color: Colors.white.withOpacity(0.0),
                         child: Column(
                           children: <Widget>[
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Row(
                                   children: <Widget>[
@@ -597,7 +609,7 @@ class _OMTScreenState extends State<OMTScreen> {
                                         },
                                         child: Text(
                                           '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
-                                          style: TextStyle(color: Colors.blue,fontSize: 11),
+                                          style: TextStyle(color: Colors.yellow,fontSize: 11),
                                         )),
                                   ],
                                 ),
@@ -623,7 +635,7 @@ class _OMTScreenState extends State<OMTScreen> {
                                         },
                                         child: Text(
                                           '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
-                                          style: TextStyle(color: Colors.blue,fontSize: 11),
+                                          style: TextStyle(color: Colors.yellow,fontSize: 11),
                                         )),
                                   ],
                                 ),
@@ -737,7 +749,7 @@ class _OMTScreenState extends State<OMTScreen> {
                                 );
                               },
                               child: Text('Transaction Report', style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.yellow,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
                               ),),

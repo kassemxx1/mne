@@ -239,6 +239,9 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 35,
+              )
             ]));
       }
       if (currentPage == 1) {
@@ -255,17 +258,24 @@ class _MainScreenState extends State<MainScreen> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'MNE',
-            style: TextStyle(
-                color: Colors.yellow,
-                fontSize: 30,
-                fontWeight: FontWeight.bold),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(40),
+          child: AppBar(
+            title: Text(
+              'MNE',
+              style: TextStyle(
+                  color: Colors.yellow,
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold),
+              
+            ),
+            backgroundColor: Colors.black54,
+            
           ),
-          backgroundColor: Colors.black54,
         ),
+        
         bottomNavigationBar: FancyBottomNavigation(
+
           tabs: [
             TabData(iconData: Icons.home, title: "Home"),
             TabData(iconData: Icons.report, title: "Reports"),
@@ -283,6 +293,7 @@ class _MainScreenState extends State<MainScreen> {
           inactiveIconColor: Colors.yellow,
           circleColor: Colors.yellow,
           textColor: Colors.yellow,
+
         ),
         body: getwidget(),
       ),

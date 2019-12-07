@@ -47,6 +47,9 @@ class _InvoicesState extends State<Invoices> {
             'value': '$name',
           });
         });
+        ListOfItems.sort((a, b) {
+          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+        });
       }
     }
     if(cat=='accessories'){
@@ -61,6 +64,9 @@ class _InvoicesState extends State<Invoices> {
             'display': '$name',
             'value': '$name',
           });
+        });
+        ListOfItems.sort((a, b) {
+          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
         });
       }
     }
@@ -78,7 +84,11 @@ class _InvoicesState extends State<Invoices> {
           });
         });
       }
+      ListOfItems.sort((a, b) {
+        return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+      });
     }
+
 
   }
 

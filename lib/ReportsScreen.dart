@@ -18,8 +18,8 @@ class ReportsScreen extends StatefulWidget {
 
 class _ReportsScreenState extends State<ReportsScreen> {
   var transaction = [];
-  var Mtransaction=[];
-  var Stransaction=[];
+  var Mtransaction = [];
+  var Stransaction = [];
   var tomorow = new DateTime(year, month, day, 23, 59, 59, 99, 99);
   var startDate = DateTime(year, month, day, 0, 0, 0, 0, 0);
   var endDate = new DateTime(year, month, day, 23, 59, 59, 99, 99);
@@ -35,19 +35,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Future<double> getTodayIn(
       DateTime start, DateTime end, List list, String currency) async {
     list.clear();
-    final messsages1 = await _firestore
-        .collection('clients')
-        .where('currnecy', isEqualTo: currency)
-        .where('timestamp', isGreaterThan: start)
-        .where('timestamp', isLessThan: end)
-        .getDocuments();
+
     final messsages = await _firestore
         .collection('transaction')
         .where('currency', isEqualTo: currency)
         .where('timestamp', isGreaterThan: start)
         .where('timestamp', isLessThan: end)
         .getDocuments();
-    final messages2= await _firestore.collection('others').where('currency', isEqualTo: currency)
+    final messages2 = await _firestore
+        .collection('others')
+        .where('currency', isEqualTo: currency)
         .where('timestamp', isGreaterThan: start)
         .where('timestamp', isLessThan: end)
         .getDocuments();
@@ -59,14 +56,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
         );
       });
     }
-    for (var msg in messsages1.documents) {
-      final price = msg.data['den'];
-      setState(() {
-        list.add(
-          -price,
-        );
-      });
-    }
+
     for (var msg in messages2.documents) {
       final price = msg.data['price'];
       setState(() {
@@ -78,28 +68,27 @@ class _ReportsScreenState extends State<ReportsScreen> {
     var result = list.reduce((sum, element) => sum + element);
     return new Future(() => result);
   }
-  void getmaintenance(DateTime s,DateTime e,String name,List Otransaction)async{
-    final messages=await _firestore.collection('others').where('timestamp',isGreaterThan: s).where('timestamp',isLessThan: e).where('name',isEqualTo: name).getDocuments();
-   Otransaction.clear();
-    for(var msg in messages.documents){
-      final des=msg.data['description'];
-      final price=msg.data['price'];
-      final id=msg.documentID;
-      final time=msg.data['timestamp'];
+
+  void getmaintenance(
+      DateTime s, DateTime e, String name, List Otransaction) async {
+    final messages = await _firestore
+        .collection('others')
+        .where('timestamp', isGreaterThan: s)
+        .where('timestamp', isLessThan: e)
+        .where('name', isEqualTo: name)
+        .getDocuments();
+    Otransaction.clear();
+    for (var msg in messages.documents) {
+      final des = msg.data['description'];
+      final price = msg.data['price'];
+      final id = msg.documentID;
+      final time = msg.data['timestamp'];
       setState(() {
-        Otransaction.add({
-          'description':des,
-          'price':price,
-          'id':id,
-          'time':time
-
-        });
+        Otransaction.add(
+            {'description': des, 'price': price, 'id': id, 'time': time});
       });
-
-
     }
   }
-
 
   Future<double> getqtt(String name) async {
     var qtts = [0.0];
@@ -169,12 +158,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   void initState() {
-
     // TODO: implement initState
     super.initState();
     gettransactiondate(startDate, endDate);
-    getmaintenance(startDate ,endDate, 'maintenance', Mtransaction);
-    getmaintenance(startDate ,endDate, 'spending', Stransaction);
+    getmaintenance(startDate, endDate, 'maintenance', Mtransaction);
+    getmaintenance(startDate, endDate, 'spending', Stransaction);
     delay();
   }
 
@@ -193,19 +181,144 @@ class _ReportsScreenState extends State<ReportsScreen> {
           dismissible: true,
           child: Column(
             children: <Widget>[
-              Card(
-                color: Colors.yellow,
-                elevation: 20,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Center(
-                        child: Text(
-                      'Daily Report',
-                      style: TextStyle(color: Colors.black54),
-                    )),
-                    Center(
-                      child: FutureBuilder(
+              Padding(
+                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                child: Card(
+                  color: Colors.white.withOpacity(0.0),
+                  elevation: 20,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                          child: Text(
+                        'Daily Report',
+                        style: TextStyle(color: Colors.black54),
+                      )),
+                      Center(
+                        child: FutureBuilder(
+                          builder: (BuildContext context,
+                              AsyncSnapshot<double> qttnumbr) {
+                            return Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text('\$  '),
+                                  Text(
+                                    '${qttnumbr.data}',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.yellow),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          initialData: 0.0,
+                          future: getTodayIn(today, tomorow, IN$, '\$'),
+                        ),
+                      ),
+                      Center(
+                        child: FutureBuilder(
+                          builder: (BuildContext context,
+                              AsyncSnapshot<double> qttnumbr) {
+                            return Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text('L.L  '),
+                                  Text(
+                                    '${qttnumbr.data}',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.yellow),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                          initialData: 0.0,
+                          future: getTodayIn(today, tomorow, INLL, 'L.L'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                child: Card(
+                  color: Colors.white.withOpacity(0.0),
+                  elevation: 20,
+                  child: Column(
+                    children: <Widget>[
+                      Center(
+                          child: Text(
+                        'Monthly Report',
+                        style: TextStyle(color: Colors.black54),
+                      )),
+                      Row(children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text('start Date:'),
+                            FlatButton(
+                                onPressed: () {
+                                  DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime(2019, 1, 1),
+                                      maxTime: DateTime(2025, 6, 7),
+                                      onChanged: (date) {}, onConfirm: (date) {
+                                    setState(() {
+                                      startDate = date;
+                                    });
+
+                                    print(startDate);
+                                  },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.en);
+                                },
+                                child: Text(
+                                  '${formatDate(startDate, [
+                                    yyyy,
+                                    '-',
+                                    mm,
+                                    '-',
+                                    dd
+                                  ])}',
+                                  style: TextStyle(color: Colors.yellow),
+                                )),
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Text('End Date:'),
+                            FlatButton(
+                                onPressed: () {
+                                  DatePicker.showDatePicker(context,
+                                      showTitleActions: true,
+                                      minTime: DateTime(2019, 1, 1),
+                                      maxTime: DateTime(2025, 6, 7),
+                                      onChanged: (date) {}, onConfirm: (date) {
+                                    setState(() {
+                                      endDate = date.add(new Duration(
+                                          hours: 23, minutes: 59, seconds: 59));
+                                    });
+                                  },
+                                      currentTime: DateTime.now(),
+                                      locale: LocaleType.en);
+                                },
+                                child: Text(
+                                  '${formatDate(endDate, [
+                                    yyyy,
+                                    '-',
+                                    mm,
+                                    '-',
+                                    dd
+                                  ])}',
+                                  style: TextStyle(color: Colors.yellow),
+                                )),
+                          ],
+                        ),
+                      ]),
+                      FutureBuilder(
                         builder: (BuildContext context,
                             AsyncSnapshot<double> qttnumbr) {
                           return Center(
@@ -216,18 +329,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 Text(
                                   '${qttnumbr.data}',
                                   style: TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                      fontSize: 20, color: Colors.yellow),
                                 ),
                               ],
                             ),
                           );
                         },
                         initialData: 0.0,
-                        future: getTodayIn(today, tomorow, IN$, '\$'),
+                        future: getTodayIn(startDate, endDate, rangeIn$, '\$'),
                       ),
-                    ),
-                    Center(
-                      child: FutureBuilder(
+                      FutureBuilder(
                         builder: (BuildContext context,
                             AsyncSnapshot<double> qttnumbr) {
                           return Center(
@@ -238,273 +349,204 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 Text(
                                   '${qttnumbr.data}',
                                   style: TextStyle(
-                                      fontSize: 20, color: Colors.black),
+                                      fontSize: 20, color: Colors.yellow),
                                 ),
                               ],
                             ),
                           );
                         },
                         initialData: 0.0,
-                        future: getTodayIn(today, tomorow, INLL, 'L.L'),
+                        future:
+                            getTodayIn(startDate, endDate, rangeInLL, 'L.L'),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              Card(
-                color: Colors.yellow,
-                elevation: 20,
-                child: Column(
-                  children: <Widget>[
-                    Center(child: Text('Monthly Report',style: TextStyle(color: Colors.black54),)),
-                    Row(children: [
+              Padding(
+                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                child: Card(
+                  color: Colors.white.withOpacity(0.0),
+                  elevation: 20,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Recharge Report',
+                        style: TextStyle(color: Colors.black54),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text('start Date:'),
-                          FlatButton(
-                              onPressed: () {
-                                DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    minTime: DateTime(2019, 1, 1),
-                                    maxTime: DateTime(2025, 6, 7),
-                                    onChanged: (date) {}, onConfirm: (date) {
-                                  setState(() {
-                                    startDate = date;
-                                  });
-
-                                  print(startDate);
-                                },
-                                    currentTime: DateTime.now(),
-                                    locale: LocaleType.en);
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'alfa 9\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
-                              child: Text(
-                                '${formatDate(startDate, [yyyy, '-', mm, '-', dd])}',
-                                style: TextStyle(color: Colors.blue),
-                              )),
+                              initialData: 0.0,
+                              future: getqtt('alfa9\$'),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        'alfa 22\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              initialData: 0.0,
+                              future: getqtt('alfa22\$'),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text(
+                                        'alfa \$\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              initialData: 0.0,
+                              future: getqtt('alfa\$\$\$'),
+                            ),
+                          ),
                         ],
                       ),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text('End Date:'),
-                          FlatButton(
-                              onPressed: () {
-                                DatePicker.showDatePicker(context,
-                                    showTitleActions: true,
-                                    minTime: DateTime(2019, 1, 1),
-                                    maxTime: DateTime(2025, 6, 7),
-                                    onChanged: (date) {}, onConfirm: (date) {
-                                      setState(() {
-                                        endDate = date.add(new Duration(
-                                            hours: 23, minutes: 59, seconds: 59));
-                                      });
-                                    }, currentTime: DateTime.now(), locale: LocaleType.en);
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'MTC 12\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
                               },
-                              child: Text(
-                                '${formatDate(endDate, [yyyy, '-', mm, '-', dd])}',
-                                style: TextStyle(color: Colors.blue),
-                              )),
+                              initialData: 0.0,
+                              future: getqtt('MTC 12\$'),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'MTC 22\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              initialData: 0.0,
+                              future: getqttmtc('mtc 22\$'),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: FutureBuilder(
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<double> qttnumbr) {
+                                return Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Text(
+                                        'MTC \$\$',
+                                        style: TextStyle(
+                                            color: Colors.black, fontSize: 15),
+                                      ),
+                                      Text(
+                                        '${qttnumbr.data.toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.yellow),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              initialData: 0.0,
+                              future: getqtt('mtc\$\$\$'),
+                            ),
+                          ),
                         ],
                       ),
-                    ]),
-                    FutureBuilder(
-                      builder:
-                          (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                        return Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text('\$  '),
-                              Text(
-                                '${qttnumbr.data}',
-                                style: TextStyle(fontSize: 20, color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      initialData: 0.0,
-                      future: getTodayIn(startDate, endDate, rangeIn$, '\$'),
-                    ),
-                    FutureBuilder(
-                      builder:
-                          (BuildContext context, AsyncSnapshot<double> qttnumbr) {
-                        return Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text('L.L  '),
-                              Text(
-                                '${qttnumbr.data}',
-                                style: TextStyle(fontSize: 20, color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      initialData: 0.0,
-                      future: getTodayIn(startDate, endDate, rangeInLL, 'L.L'),
-                    ),
-
-
-                  ],
+                    ],
+                  ),
                 ),
               ),
-
-
-              Card(
-                color: Colors.yellow,
-                elevation: 20,
-                child: Column(
-                  children: <Widget>[
-                    Text('Recharge Report',style: TextStyle(color: Colors.black54),),
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('alfa 9\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt('alfa9\$'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('alfa 22\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt('alfa22\$'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('alfa \$\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt('alfa\$\$\$'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('MTC 12\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt('MTC 12\$'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('MTC 22\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqttmtc('mtc 22\$'),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    Text('MTC \$\$',style: TextStyle(color: Colors.black,fontSize: 20),),
-                                    Text(
-                                      '${qttnumbr.data.toStringAsFixed(2)}',
-                                      style: TextStyle(
-                                          fontSize: 20, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt('mtc\$\$\$'),
-                          ),
-                        ),
-                      ],
-                    ),
-
-
-
-                  ],
-                ),
-              ),
-
               MaterialButton(
                 onPressed: () {
                   gettransactiondate(startDate, endDate);
@@ -632,7 +674,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               MaterialButton(
                 onPressed: () {
-                  getmaintenance(startDate, endDate,'maintenance',Mtransaction);
+                  getmaintenance(
+                      startDate, endDate, 'maintenance', Mtransaction);
                   print(transaction);
                   showDialog(
                       context: context,
@@ -640,7 +683,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         return AlertDialog(
                           shape: RoundedRectangleBorder(
                               borderRadius:
-                              BorderRadius.all(Radius.circular(10.0))),
+                                  BorderRadius.all(Radius.circular(10.0))),
                           content: Scaffold(
                             body: Container(
                               child: new ListView.builder(
@@ -652,21 +695,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                       ),
                                       onDismissed:
                                           (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                        print('${transaction[index]['id']}');
-                                        print(transaction[index]);
                                         await _firestore
                                             .collection('others')
                                             .document(
-                                            '${transaction[index]['id']}')
+                                                '${Mtransaction[index]['id']}')
                                             .delete();
-                                        getmaintenance(startDate, endDate,'maintenance',Mtransaction);
-                                        transaction.remove(Mtransaction[index]);
+                                        getmaintenance(startDate, endDate,
+                                            'maintenance', Mtransaction);
+                                        Mtransaction.remove(
+                                            Mtransaction[index]);
                                       },
                                       key: Key(Mtransaction[index].toString()),
                                       child: Card(
@@ -688,7 +725,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                               Container(
                                                 child: Padding(
                                                   padding:
-                                                  const EdgeInsets.all(8.0),
+                                                      const EdgeInsets.all(8.0),
                                                   child: Text(
                                                     '${Mtransaction[index]['description'].toString()}',
                                                     style: TextStyle(
@@ -698,8 +735,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
-                                                      color: Colors.black,
-                                                    )),
+                                                  color: Colors.black,
+                                                )),
                                                 width: 70,
                                               ),
                                               Container(
@@ -709,7 +746,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 width: 70,
                                                 child: Padding(
                                                   padding:
-                                                  const EdgeInsets.all(8.0),
+                                                      const EdgeInsets.all(8.0),
                                                   child: Text(
                                                     '${Mtransaction[index]['price'].toString()}',
                                                     style: TextStyle(
@@ -718,7 +755,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                   ),
                                                 ),
                                               ),
-
                                             ],
                                           ),
                                         ),
@@ -741,7 +777,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               ),
               MaterialButton(
                 onPressed: () {
-                  getmaintenance(startDate, endDate,'spending',Stransaction);
+                  getmaintenance(startDate, endDate, 'spending', Stransaction);
                   print(transaction);
                   showDialog(
                       context: context,
@@ -749,7 +785,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         return AlertDialog(
                           shape: RoundedRectangleBorder(
                               borderRadius:
-                              BorderRadius.all(Radius.circular(10.0))),
+                                  BorderRadius.all(Radius.circular(10.0))),
                           content: Scaffold(
                             body: Container(
                               child: new ListView.builder(
@@ -761,21 +797,15 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                       ),
                                       onDismissed:
                                           (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                        print('${transaction[index]['id']}');
-                                        print(transaction[index]);
                                         await _firestore
                                             .collection('others')
                                             .document(
-                                            '${transaction[index]['id']}')
+                                                '${Stransaction[index]['id']}')
                                             .delete();
-                                        getmaintenance(startDate, endDate,'spending',Stransaction);
-                                        transaction.remove(Stransaction[index]);
+                                        getmaintenance(startDate, endDate,
+                                            'spending', Stransaction);
+                                        Stransaction.remove(
+                                            Stransaction[index]);
                                       },
                                       key: Key(Stransaction[index].toString()),
                                       child: Card(
@@ -797,7 +827,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                               Container(
                                                 child: Padding(
                                                   padding:
-                                                  const EdgeInsets.all(8.0),
+                                                      const EdgeInsets.all(8.0),
                                                   child: Text(
                                                     '${Stransaction[index]['description'].toString()}',
                                                     style: TextStyle(
@@ -807,8 +837,8 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
-                                                      color: Colors.black,
-                                                    )),
+                                                  color: Colors.black,
+                                                )),
                                                 width: 70,
                                               ),
                                               Container(
@@ -818,7 +848,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 width: 70,
                                                 child: Padding(
                                                   padding:
-                                                  const EdgeInsets.all(8.0),
+                                                      const EdgeInsets.all(8.0),
                                                   child: Text(
                                                     '${Stransaction[index]['price'].toString()}',
                                                     style: TextStyle(
@@ -827,7 +857,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                   ),
                                                 ),
                                               ),
-
                                             ],
                                           ),
                                         ),
@@ -848,11 +877,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
               ),
-
-
-
-
-
             ],
           ),
         ));

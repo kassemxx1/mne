@@ -213,6 +213,24 @@ class _accesscatState extends State<accesscat> {
                     color: Colors.yellow,
                     child: MaterialButton(
                       child: Container(
+                        child: Center(child: Text('Acc',style: TextStyle(color: Colors.black,fontSize: 30),)),
+                      ),
+                      onPressed: (){
+                        setState(() {
+                          AccessoriesScreen.accesscat='Acc';
+                        });
+                        Navigator.pushNamed(context, AccessoriesScreen.id);
+
+                      },
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Card(
+                    elevation: 20,
+                    color: Colors.yellow,
+                    child: MaterialButton(
+                      child: Container(
                         child: Center(child: Text('Home',style: TextStyle(color: Colors.black,fontSize: 30),)),
                       ),
                       onPressed: (){
