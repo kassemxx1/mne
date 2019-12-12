@@ -8,48 +8,42 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 final _firestore = Firestore.instance;
 FirebaseStorage _storage = FirebaseStorage.instance;
 
 class AccessoriesScreen extends StatefulWidget {
-  static const String id='Accessories_Screen';
-  static String accesscat='';
+  static const String id = 'Accessories_Screen';
+  static String accesscat = '';
   @override
   _AccessoriesScreenState createState() => _AccessoriesScreenState();
 }
 
 class _AccessoriesScreenState extends State<AccessoriesScreen> {
   var ListOfPhones = [];
-  var ListOfItems=[];
+  var ListOfItems = [];
   var ImageLink;
-  var upload='Choose the Item Image';
-  var nameOfItem='';
-  var PriceOfItem='';
-  bool _saving=true;
-  bool _save=false;
-  DateTime now ;
+  var upload = 'Choose the Item Image';
+  var nameOfItem = '';
+  var PriceOfItem = '';
+  bool _saving = true;
+  bool _save = false;
+  DateTime now;
 
-  Future delay() async{
-    await new Future.delayed(new Duration(seconds: 5), ()
-    {
+  Future delay() async {
+    await new Future.delayed(new Duration(seconds: 5), () {
       setState(() {
-        _saving=false;
+        _saving = false;
       });
-
     });
   }
 
-
-
   Future<String> uploadPic() async {
-
-
     //Get the file from the image picker and store it
     File image = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
-
-      now=DateTime.now();
-      _save=true;
+      now = DateTime.now();
+      _save = true;
     });
 
     //Create a reference to the location you want to upload to in firebase
@@ -59,11 +53,12 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
     StorageUploadTask uploadTask = reference.putFile(image);
 
     // Waits till the file is uploaded then stores the download url
-    String location = await (await uploadTask.onComplete).ref.getDownloadURL() as String;
+    String location =
+        await (await uploadTask.onComplete).ref.getDownloadURL() as String;
     print(location);
     setState(() {
-      _save=false;
-      upload ='Uploaded';
+      _save = false;
+      upload = 'Uploaded';
       ImageLink = location;
 
       print(_save);
@@ -71,22 +66,27 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
 
     //returns the download url
     return location;
-
   }
 
   void getPhonesList() async {
     ListOfPhones.clear();
-    final messages = await _firestore.collection('accessories').where('subcat',isEqualTo: AccessoriesScreen.accesscat).where('categories',isEqualTo: 'accessories').getDocuments();
+    final messages = await _firestore
+        .collection('accessories')
+        .where('subcat', isEqualTo: AccessoriesScreen.accesscat)
+        .where('categories', isEqualTo: 'accessories')
+        .getDocuments();
     for (var msg in messages.documents) {
       final name = msg['phonename'].toString();
       final price = msg['price'];
       final image = msg['image'].toString();
       setState(() {
         ListOfPhones.add({'phonename': name, 'price': price, 'image': image});
-        _saving=false;
+        _saving = false;
       });
       ListOfPhones.sort((a, b) {
-        return a['phonename'].toLowerCase().compareTo(b['phonename'].toLowerCase());
+        return a['phonename']
+            .toLowerCase()
+            .compareTo(b['phonename'].toLowerCase());
       });
     }
   }
@@ -106,19 +106,19 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
     var result = qtts.reduce((sum, element) => sum + element);
     return new Future(() => result);
   }
+
   @override
   void initState() {
     super.initState();
     getPhonesList();
     delay();
-
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: ModalProgressHUD(
-
           inAsyncCall: _saving,
           dismissible: true,
           child: Container(
@@ -126,12 +126,14 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
             child: CustomScrollView(
               slivers: <Widget>[
                 SliverAppBar(
-
                   actions: <Widget>[
-                    IconButton(icon:Icon(Icons.add,color: Colors.black,),
-
-                        onPressed:(){
-                      var nn=1.0;
+                    IconButton(
+                        icon: Icon(
+                          Icons.add,
+                          color: Colors.black,
+                        ),
+                        onPressed: () {
+                          var nn = 1.0;
                           showDialog(
                               context: context,
                               builder: (BuildContext context) {
@@ -144,110 +146,110 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           MaterialButton(
-                                            onPressed: (){
-                                              setState(() {
-
-                                                uploadPic();
-                                              },);
+                                            onPressed: () {
+                                              setState(
+                                                () {
+                                                  uploadPic();
+                                                },
+                                              );
                                             },
                                             child: Text(upload),
                                           ),
-
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 10, right: 10,top: 10),
+                                                left: 10, right: 10, top: 10),
                                             child: TextField(
-                                              keyboardType: TextInputType
-                                                  .emailAddress,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
                                               textAlign: TextAlign.center,
                                               onChanged: (value) {
                                                 setState(() {
                                                   nameOfItem = value;
                                                 });
                                               },
-                                              decoration:
-                                              KTextFieldImputDecoration
+                                              decoration: KTextFieldImputDecoration
                                                   .copyWith(
-                                                  hintText:
-                                                  'Enter the Name Of Item'),
+                                                      hintText:
+                                                          'Enter the Name Of Item'),
                                             ),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 10, right: 10,top: 10),
+                                                left: 10, right: 10, top: 10),
                                             child: TextField(
-                                              keyboardType: TextInputType
-                                                  .emailAddress,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
                                               textAlign: TextAlign.center,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  PriceOfItem =
-                                                      value;
+                                                  PriceOfItem = value;
                                                 });
                                               },
-                                              decoration:
-                                              KTextFieldImputDecoration
+                                              decoration: KTextFieldImputDecoration
                                                   .copyWith(
-                                                  hintText:
-                                                  'Enter the Price Of Item in \$'),
+                                                      hintText:
+                                                          'Enter the Price Of Item in \$'),
                                             ),
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
-                                                left: 10, right: 10,top: 10),
+                                                left: 10, right: 10, top: 10),
                                             child: TextField(
-                                              keyboardType: TextInputType
-                                                  .emailAddress,
+                                              keyboardType:
+                                                  TextInputType.emailAddress,
                                               textAlign: TextAlign.center,
                                               onChanged: (value) {
                                                 setState(() {
-                                                  nn =
-                                                  (double.parse(value));
+                                                  nn = (double.parse(value));
                                                 });
                                               },
                                               decoration:
-                                              KTextFieldImputDecoration
-                                                  .copyWith(
-                                                  hintText:
-                                                  'Enter the Qtt'),
+                                                  KTextFieldImputDecoration
+                                                      .copyWith(
+                                                          hintText:
+                                                              'Enter the Qtt'),
                                             ),
                                           ),
                                           MaterialButton(
-                                              child: Text('Add',style: TextStyle(fontSize: 30,color: Colors.blueAccent),),
-                                              onPressed: (){
-                                                _firestore.collection('accessories').add({
-                                                  'phonename':nameOfItem,
+                                              child: Text(
+                                                'Add',
+                                                style: TextStyle(
+                                                    fontSize: 30,
+                                                    color: Colors.blueAccent),
+                                              ),
+                                              onPressed: () {
+                                                _firestore
+                                                    .collection('accessories')
+                                                    .add({
+                                                  'phonename': nameOfItem,
                                                   'price': PriceOfItem,
                                                   'image': ImageLink,
                                                   'INOUT': 'out',
-                                                  'categories':'accessories',
-                                                  'subcat':AccessoriesScreen.accesscat,
+                                                  'categories': 'accessories',
+                                                  'subcat': AccessoriesScreen
+                                                      .accesscat,
                                                 });
-                                                _firestore.collection('transaction').add({
-                                                  'name':nameOfItem ,
+                                                _firestore
+                                                    .collection('transaction')
+                                                    .add({
+                                                  'name': nameOfItem,
                                                   'categorie': 'accessories',
                                                   'inout': 'in',
                                                   'qtt': nn,
                                                 });
                                                 getPhonesList();
                                                 setState(() {
-                                                  upload='choose your image';
+                                                  upload = 'choose your image';
                                                 });
-
 
                                                 Navigator.of(context).pop();
                                               }),
-
-
-
                                         ],
                                       ),
                                     ),
                                   ),
                                 );
                               });
-
-
                         })
                   ],
                   title: Text(
@@ -262,11 +264,11 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                 ),
                 SliverGrid(
                     delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
+                      (BuildContext context, int index) {
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               var _n = -1.0;
                               var _price = 0.0;
                               var currency = 'L.L';
@@ -274,7 +276,6 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-
                                       content: Form(
                                         child: Column(
                                           mainAxisSize: MainAxisSize.min,
@@ -282,19 +283,16 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                             Expanded(
                                               child: Container(
                                                 child: CachedNetworkImage(
-                                                  imageUrl:
-                                                  ListOfPhones[index]
-                                                  ['image'],
+                                                  imageUrl: ListOfPhones[index]
+                                                      ['image'],
                                                 ),
                                               ),
                                             ),
                                             Text(
-                                              ListOfPhones[index]
-                                              ['phonename'],
+                                              ListOfPhones[index]['phonename'],
                                               style: TextStyle(
                                                   fontSize: 20,
-                                                  fontWeight:
-                                                  FontWeight.bold),
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                             Text(
                                               '${ListOfPhones[index]['price'].toString()} \$',
@@ -304,10 +302,9 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                   color: Colors.green),
                                             ),
                                             FutureBuilder(
-                                                builder:
-                                                    (BuildContext context,
+                                                builder: (BuildContext context,
                                                     AsyncSnapshot<double>
-                                                    qttnumbr) {
+                                                        qttnumbr) {
                                                   return Center(
                                                     child: Text(
                                                       'Available : ${qttnumbr.data}',
@@ -317,13 +314,13 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                 initialData: 1.0,
                                                 future: getqtt(
                                                     ListOfPhones[index]
-                                                    ['phonename'])),
+                                                        ['phonename'])),
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 40, right: 40,top: 10),
+                                                  left: 40, right: 40, top: 10),
                                               child: TextField(
-                                                keyboardType: TextInputType
-                                                    .emailAddress,
+                                                keyboardType:
+                                                    TextInputType.emailAddress,
                                                 textAlign: TextAlign.center,
                                                 onChanged: (value) {
                                                   setState(() {
@@ -331,34 +328,35 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                   });
                                                 },
                                                 decoration:
-                                                KTextFieldImputDecoration
-                                                    .copyWith(
-                                                    hintText:
-                                                    'Enter Your Qtt'),
+                                                    KTextFieldImputDecoration
+                                                        .copyWith(
+                                                            hintText:
+                                                                'Enter Your Qtt'),
                                               ),
                                             ),
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  left: 40, right: 40,top: 10),
+                                                  left: 40, right: 40, top: 10),
                                               child: TextField(
-                                                keyboardType: TextInputType
-                                                    .emailAddress,
+                                                keyboardType:
+                                                    TextInputType.emailAddress,
                                                 textAlign: TextAlign.center,
                                                 onChanged: (value) {
                                                   setState(() {
                                                     _price =
-                                                    (double.parse(value));
+                                                        (double.parse(value));
                                                   });
                                                 },
                                                 decoration:
-                                                KTextFieldImputDecoration
-                                                    .copyWith(
-                                                    hintText:
-                                                    'Enter Your Price'),
+                                                    KTextFieldImputDecoration
+                                                        .copyWith(
+                                                            hintText:
+                                                                'Enter Your Price'),
                                               ),
                                             ),
                                             Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: CustomRadioButton(
                                                 buttonColor: Theme.of(context)
                                                     .canvasColor,
@@ -367,7 +365,6 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                                   '\$',
                                                 ],
                                                 buttonValues: [
-
                                                   'L.L',
                                                   '\$',
                                                 ],
@@ -384,24 +381,70 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                               padding: const EdgeInsets.only(
                                                   top: 10, bottom: 10),
                                               child: MaterialButton(
-                                                child: Text('Sell',style: TextStyle(fontSize: 30,color: Colors.blueAccent,fontWeight: FontWeight.bold),),
+                                                child: Text(
+                                                  'Sell',
+                                                  style: TextStyle(
+                                                      fontSize: 30,
+                                                      color: Colors.blueAccent,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
                                                 onPressed: () {
-                                                  _firestore
-                                                      .collection(
-                                                      'transaction')
-                                                      .add({
-                                                    'name':
-                                                    ListOfPhones[index]['phonename'],
-                                                    'qtt': _n,
-                                                    'price': _price,
-                                                    'timestamp':
-                                                    DateTime.now(),
-                                                    'currency': currency,
-                                                  });
-                                                  setState(() {
-                                                    getqtt(ListOfPhones[index]['phonename']);
-                                                  });
-                                                  Navigator.of(context).pop();
+                                                  return showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              'Are You Sure to sell ${ListOfPhones[index]['phonename']}'),
+                                                          actions: <Widget>[
+                                                            MaterialButton(
+                                                              child: Text(
+                                                                  'cancel'),
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            ),
+                                                            MaterialButton(
+                                                              child:
+                                                                  Text('Yes'),
+                                                              onPressed: () {
+                                                                _firestore
+                                                                    .collection(
+                                                                        'transaction')
+                                                                    .add({
+                                                                  'name': ListOfPhones[
+                                                                          index]
+                                                                      [
+                                                                      'phonename'],
+                                                                  'qtt': _n,
+                                                                  'price':
+                                                                      _price,
+                                                                  'timestamp':
+                                                                      DateTime
+                                                                          .now(),
+                                                                  'currency':
+                                                                      currency,
+                                                                });
+                                                                setState(() {
+                                                                  getqtt(ListOfPhones[
+                                                                          index]
+                                                                      [
+                                                                      'phonename']);
+                                                                });
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop();
+                                                              },
+                                                            )
+                                                          ],
+                                                        );
+                                                      });
                                                 },
                                               ),
                                             ),
@@ -423,19 +466,22 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(3.0),
                                             child: CachedNetworkImage(
-                                              imageUrl: ListOfPhones[index]['image'],
+                                              imageUrl: ListOfPhones[index]
+                                                  ['image'],
                                             ),
                                           ),
                                         ),
                                       ),
                                       Text(
                                         ListOfPhones[index]['phonename'],
-                                        style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         '${ListOfPhones[index]['price'].toString()} \$',
-                                        style:
-                                        TextStyle(fontSize: 15, color: Colors.green),
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.green),
                                       ),
                                       FutureBuilder(
                                           builder: (BuildContext context,
@@ -443,23 +489,23 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                             return Center(
                                               child: Row(
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: <Widget>[
                                                   Text('Available:'),
                                                   Text(
                                                     '${qttnumbr.data}',
                                                     style: TextStyle(
                                                         fontSize: 16,
-                                                        color: Colors.blueAccent),
+                                                        color:
+                                                            Colors.blueAccent),
                                                   ),
                                                 ],
                                               ),
                                             );
                                           },
                                           initialData: 0.0,
-                                          future:
-                                          getqtt(ListOfPhones[index]['phonename'])),
-
+                                          future: getqtt(ListOfPhones[index]
+                                              ['phonename'])),
                                     ],
                                   ),
                                 ),

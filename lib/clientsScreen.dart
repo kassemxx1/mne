@@ -614,21 +614,47 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                           color: Colors.red,
                                         ),
                                         onDismissed:
-                                            (DismissDirection direction) async {
+                                            (DismissDirection direction)  {
+                                              return showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                          'Are You Sure To delete ?'),
+                                                      actions: <Widget>[
+                                                        MaterialButton(
+                                                          child: Text('Cancel'),
+                                                          onPressed: () {
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                        ),
+                                                        MaterialButton(
+                                                          child: Text('Yes'),
+                                                          onPressed: () async {
+                                                            await _firestore
+                                                                .collection('transaction')
+                                                                .document('${transaction[index]['id']}')
+                                                                .delete();
+
+
+                                                            transaction.remove(transaction[index]);
+                                                            gettransactiondate(mytext);
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                        )
+                                                      ],
+                                                    );
+                                                  });
+
 //                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
 //                                      for (DocumentSnapshot ds in snapshot.documents){
 //                                        ds.reference.delete();
 //                                      });
 //                                    }
 
-                                          await _firestore
-                                              .collection('transaction')
-                                              .document('${transaction[index]['id']}')
-                                              .delete();
 
-
-                                          transaction.remove(transaction[index]);
-                                          gettransactiondate(mytext);
                                         },
                                         key: Key(transaction[index].toString()),
                                         child: Card(
@@ -762,19 +788,46 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                           color: Colors.red,
                                         ),
                                         onDismissed:
-                                            (DismissDirection direction) async {
+                                            (DismissDirection direction)  {
+
+                                              return showDialog(
+                                                  context: context,
+                                                  builder: (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                          'Are You Sure To delete ?'),
+                                                      actions: <Widget>[
+                                                        MaterialButton(
+                                                          child: Text('Cancel'),
+                                                          onPressed: () {
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                        ),
+                                                        MaterialButton(
+                                                          child: Text('Yes'),
+                                                          onPressed: () async {
+                                                            await _firestore
+                                                                .collection('transaction')
+                                                                .document('${dtransaction[index]['id']}')
+                                                                .delete();
+                                                            gettransaction(today,tomorow,mytext);
+                                                            dtransaction.remove(dtransaction[index]);
+                                                            Navigator.of(context)
+                                                                .pop();
+                                                          },
+                                                        )
+                                                      ],
+                                                    );
+                                                  });
+
 //                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
 //                                      for (DocumentSnapshot ds in snapshot.documents){
 //                                        ds.reference.delete();
 //                                      });
 //                                    }
 
-                                          await _firestore
-                                              .collection('transaction')
-                                              .document('${dtransaction[index]['id']}')
-                                              .delete();
-                                          gettransaction(today,tomorow,mytext);
-                                          dtransaction.remove(dtransaction[index]);
+
                                         },
                                         key: Key(dtransaction[index].toString()),
                                         child: Card(
@@ -949,20 +1002,44 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                                 color: Colors.red,
                                               ),
                                               onDismissed:
-                                                  (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
+                                                  (DismissDirection direction)  {
+                                                    return showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext context) {
+                                                          return AlertDialog(
+                                                            title: Text(
+                                                                'Are You Sure To delete ?'),
+                                                            actions: <Widget>[
+                                                              MaterialButton(
+                                                                child: Text('Cancel'),
+                                                                onPressed: () {
+                                                                  Navigator.of(context)
+                                                                      .pop();
+                                                                },
+                                                              ),
+                                                              MaterialButton(
+                                                                child: Text('Yes'),
+                                                                onPressed: () async {
+                                                                  await _firestore
+                                                                      .collection('transaction')
+                                                                      .document('${dtransaction[index]['id']}')
+                                                                      .delete();
+                                                                  gettransaction(today,tomorow,mytext);
+                                                                  dtransaction.remove(dtransaction[index]);
+                                                                  gettransaction(today, tomorow, mytext);
+                                                                  Navigator.of(context)
+                                                                      .pop();
+                                                                },
+                                                              )
+                                                            ],
+                                                          );
+                                                        });
 
-                                                await _firestore
-                                                    .collection('transaction')
-                                                    .document('${dtransaction[index]['id']}')
-                                                    .delete();
-                                                gettransaction(today,tomorow,mytext);
-                                                dtransaction.remove(dtransaction[index]);
-                                                gettransaction(today, tomorow, mytext);
+
+
+
+
+
                                               },
                                               key: Key(dtransaction[index].toString()),
                                               child: Card(

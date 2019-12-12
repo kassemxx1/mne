@@ -10,6 +10,7 @@ import 'phonecategories.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'OthersScreen.dart';
 
+
 var currentPage = 0;
 
 class MainScreen extends StatefulWidget {
@@ -19,6 +20,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+
+
+
   @override
   Widget build(BuildContext context) {
     Widget getwidget() {
@@ -26,6 +30,7 @@ class _MainScreenState extends State<MainScreen> {
         return Container(
             color: Colors.black54,
             child: Column(children: [
+
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),

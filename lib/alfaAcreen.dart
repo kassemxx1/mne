@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 final _firestore = Firestore.instance;
 FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -23,22 +24,47 @@ class _AlfaScreenState extends State<AlfaScreen> {
   var upload = 'Choose the Item Image';
   var nameOfItem = '';
   var PriceOfItem = '';
-  bool _saving=true;
-
-  Future delay() async{
-    await new Future.delayed(new Duration(seconds: 5), ()
-    {
+  bool _saving = true;
+  var msg = 0.4;
+  void getcost(double _n) {
+    if (10 < -_n && -_n <= 20) {
       setState(() {
-        _saving=false;
+        msg = msg * 2;
       });
-
-    });
+    }
+    if (20 < -_n && -_n <= 30) {
+      setState(() {
+        msg = msg * 3;
+      });
+    }
+    if (40 < -_n && -_n <= 50) {
+      setState(() {
+        msg = msg * 4;
+      });
+    }
+    if (50 < -_n && -_n <= 60) {
+      setState(() {
+        msg = msg * 5;
+      });
+    }
+    if (60 < -_n && -_n <= 70) {
+      setState(() {
+        msg = msg * 6;
+      });
+    } else {
+      setState(() {
+        msg = 0.4;
+      });
+    }
   }
 
-
-
-
-
+  Future delay() async {
+    await new Future.delayed(new Duration(seconds: 5), () {
+      setState(() {
+        _saving = false;
+      });
+    });
+  }
 
   Future<String> uploadPic() async {
     //Get the file from the image picker and store it
@@ -52,7 +78,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
 
     // Waits till the file is uploaded then stores the download url
     String location =
-    await (await uploadTask.onComplete).ref.getDownloadURL() as String;
+        await (await uploadTask.onComplete).ref.getDownloadURL() as String;
     print(location);
     setState(() {
       upload = 'Uploade';
@@ -76,7 +102,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
       final image = msg['image'].toString();
       setState(() {
         ListOfPhones.add({'phonename': name, 'price': price, 'image': image});
-        _saving=false;
+        _saving = false;
       });
     }
   }
@@ -128,7 +154,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
               ),
               SliverGrid(
                   delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
+                    (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Card(
@@ -149,8 +175,8 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                 ),
                                 Text(
                                   '${ListOfPhones[index]['price'].toString()} \$',
-                                  style:
-                                  TextStyle(fontSize: 16, color: Colors.green),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.green),
                                 ),
                                 FutureBuilder(
                                     builder: (BuildContext context,
@@ -158,11 +184,11 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                       return Center(
                                         child: Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           children: <Widget>[
                                             Text('Available:'),
                                             Text(
-                                              '${ListOfPhones[index]['phonename']=='alfa\$\$\$'?qttnumbr.data.toStringAsFixed(2):qttnumbr.data.round()}',
+                                              '${ListOfPhones[index]['phonename'] == 'alfa\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.blueAccent),
@@ -172,8 +198,8 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                       );
                                     },
                                     initialData: 0.0,
-                                    future:
-                                    getqtt(ListOfPhones[index]['phonename'])),
+                                    future: getqtt(
+                                        ListOfPhones[index]['phonename'])),
                                 MaterialButton(
                                   child: Text(
                                     'Sell',
@@ -198,31 +224,32 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                     child: Container(
                                                       child: CachedNetworkImage(
                                                         imageUrl:
-                                                        ListOfPhones[index]
-                                                        ['image'],
+                                                            ListOfPhones[index]
+                                                                ['image'],
                                                       ),
                                                     ),
                                                   ),
                                                   Text(
                                                     ListOfPhones[index]
-                                                    ['phonename'],
+                                                        ['phonename'],
                                                     style: TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
-                                                        FontWeight.bold),
+                                                            FontWeight.bold),
                                                   ),
                                                   Text(
                                                     '${ListOfPhones[index]['price'].toString()} \$',
                                                     style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: Colors.green),
                                                   ),
                                                   FutureBuilder(
-                                                      builder:
-                                                          (BuildContext context,
+                                                      builder: (BuildContext
+                                                              context,
                                                           AsyncSnapshot<double>
-                                                          qttnumbr) {
+                                                              qttnumbr) {
                                                         return Center(
                                                           child: Text(
                                                             'Available : ${qttnumbr.data}',
@@ -232,16 +259,19 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                       initialData: 1.0,
                                                       future: getqtt(
                                                           ListOfPhones[index]
-                                                          ['phonename'])),
+                                                              ['phonename'])),
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 40,
-                                                        right: 40,
-                                                        top: 10),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 40,
+                                                            right: 40,
+                                                            top: 10),
                                                     child: TextField(
-                                                      keyboardType: TextInputType
-                                                          .emailAddress,
-                                                      textAlign: TextAlign.center,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .emailAddress,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       onChanged: (value) {
                                                         setState(() {
                                                           _n = -(double.parse(
@@ -249,42 +279,47 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                         });
                                                       },
                                                       decoration:
-                                                      KTextFieldImputDecoration
-                                                          .copyWith(
-                                                          hintText:
-                                                          'Enter Your Qtt'),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 40,
-                                                        right: 40,
-                                                        top: 10),
-                                                    child: TextField(
-                                                      keyboardType: TextInputType
-                                                          .emailAddress,
-                                                      textAlign: TextAlign.center,
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          _price =
-                                                          (double.parse(value));
-                                                        });
-                                                      },
-                                                      decoration:
-                                                      KTextFieldImputDecoration
-                                                          .copyWith(
-                                                          hintText:
-                                                          'Enter Your Price'),
+                                                          KTextFieldImputDecoration
+                                                              .copyWith(
+                                                                  hintText:
+                                                                      'Enter Your Qtt'),
                                                     ),
                                                   ),
                                                   Padding(
                                                     padding:
-                                                    const EdgeInsets.all(8.0),
+                                                        const EdgeInsets.only(
+                                                            left: 40,
+                                                            right: 40,
+                                                            top: 10),
+                                                    child: TextField(
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .emailAddress,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          _price =
+                                                              (double.parse(
+                                                                  value));
+                                                        });
+                                                      },
+                                                      decoration:
+                                                          KTextFieldImputDecoration
+                                                              .copyWith(
+                                                                  hintText:
+                                                                      'Enter Your Price'),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: CustomRadioButton(
-                                                      buttonColor: Theme.of(context)
-                                                          .canvasColor,
+                                                      buttonColor:
+                                                          Theme.of(context)
+                                                              .canvasColor,
                                                       buttonLables: [
-
                                                         'L.L',
                                                         '\$',
                                                       ],
@@ -292,113 +327,311 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                         'L.L',
                                                         '\$',
                                                       ],
-                                                      radioButtonValue: (value) {
+                                                      radioButtonValue:
+                                                          (value) {
                                                         setState(() {
                                                           currency = value;
                                                         });
                                                       },
                                                       selectedColor:
-                                                      Theme.of(context)
-                                                          .accentColor,
+                                                          Theme.of(context)
+                                                              .accentColor,
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 10, bottom: 10),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10),
                                                     child: MaterialButton(
                                                       child: Text(
                                                         'Sell',
                                                         style: TextStyle(
                                                             fontSize: 30,
-                                                            color:
-                                                            Colors.blueAccent,
+                                                            color: Colors
+                                                                .blueAccent,
                                                             fontWeight:
-                                                            FontWeight.bold),
+                                                                FontWeight
+                                                                    .bold),
                                                       ),
                                                       onPressed: () {
-                                                        if (ListOfPhones[index]
-                                                        ['phonename'] ==
-                                                            'alfa Days' ||
-                                                            ListOfPhones[index]
-                                                            ['phonename'] ==
-                                                                'alfa\$\$\$') {
-                                                          if (ListOfPhones[index]
-                                                          ['phonename'] ==
-                                                              'alfa Days') {
-                                                            _firestore
-                                                                .collection(
-                                                                'transaction')
-                                                                .add({
-                                                              'name': 'alfa22\$',
-                                                              'qtt': -1.0,
-                                                              'price': _price,
-                                                              'timestamp':
-                                                              DateTime.now(),
-                                                              'currency': currency,
-                                                            });
-                                                            _firestore
-                                                                .collection(
-                                                                'transaction')
-                                                                .add({
-                                                              'name': 'alfa\$\$\$',
-                                                              'qtt': -(_n),
-                                                              'timestamp':
-                                                              DateTime.now(),
+                                                        return showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    conext) {
+                                                              return AlertDialog(
+                                                                title: Text(
+                                                                    'Are You Sure to Sell ${-_n} ${ListOfPhones[index]['phonename']}?'),
+                                                                actions: <
+                                                                    Widget>[
+                                                                  MaterialButton(
+                                                                    child: Text(
+                                                                        'cancel'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                  ),
+                                                                  MaterialButton(
+                                                                    child: Text(
+                                                                        'yes'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      if (ListOfPhones[index]['phonename'] ==
+                                                                              'alfa Days' ||
+                                                                          ListOfPhones[index]['phonename'] ==
+                                                                              'alfa\$\$\$') {
+                                                                        if (ListOfPhones[index]['phonename'] ==
+                                                                            'alfa Days') {
+                                                                          _firestore
+                                                                              .collection('transaction')
+                                                                              .add({
+                                                                            'name':
+                                                                                'alfa22\$',
+                                                                            'qtt':
+                                                                                -1.0,
+                                                                            'price':
+                                                                                _price,
+                                                                            'timestamp':
+                                                                                DateTime.now(),
+                                                                            'currency':
+                                                                                currency,
+                                                                          });
+                                                                          _firestore
+                                                                              .collection('transaction')
+                                                                              .add({
+                                                                            'name':
+                                                                                'alfa\$\$\$',
+                                                                            'qtt':
+                                                                                -(_n),
+                                                                            'timestamp':
+                                                                                DateTime.now(),
+                                                                          });
+
+                                                                          setState(
+                                                                              () {
+                                                                            getqtt('alfa22\$');
+                                                                            getqtt('alfa\$\$\$');
+                                                                          });
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        } else {
+                                                                          if (-_n > 10.0 &&
+                                                                              -_n < 20.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - .8),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 20.0 &&
+                                                                              -_n < 30.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 1.2),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 30.0 &&
+                                                                              -_n < 40.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 1.6),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                            //                                                                          _firestore
+
+                                                                          }
+                                                                          if (-_n > 40.0 &&
+                                                                              -_n < 50.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 2.0),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 50.0 &&
+                                                                              -_n < 60.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 2.4),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                            //                                                                          _firestore
+
+                                                                          }
+                                                                          if (-_n > 60.0 &&
+                                                                              -_n < 70.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 2.8),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 00.0 &&
+                                                                              -_n < 10.0) {
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - .4),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+
+//                                                                          _firestore
+//                                                                              .collection('transaction')
+//                                                                              .add({
+//                                                                            'name':
+//                                                                                ListOfPhones[index]['phonename'],
+//                                                                            'qtt':
+//                                                                                (_n - msg),
+//                                                                            'price':
+//                                                                                _price,
+//                                                                            'timestamp':
+//                                                                                DateTime.now(),
+//                                                                            'currency':
+//                                                                                currency,
+//                                                                          });
+                                                                          setState(
+                                                                              () {
+                                                                            getqtt(ListOfPhones[index]['phonename']);
+                                                                          });
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        }
+                                                                      } else {
+                                                                        _firestore
+                                                                            .collection('transaction')
+                                                                            .add({
+                                                                          'name':
+                                                                              ListOfPhones[index]['phonename'],
+                                                                          'qtt':
+                                                                              _n,
+                                                                          'price':
+                                                                              _price,
+                                                                          'timestamp':
+                                                                              DateTime.now(),
+                                                                          'currency':
+                                                                              currency,
+                                                                        });
+                                                                        setState(
+                                                                            () {
+                                                                          getqtt(ListOfPhones[index]
+                                                                              [
+                                                                              'phonename']);
+                                                                        });
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      }
+                                                                    },
+                                                                  )
+                                                                ],
+                                                              );
                                                             });
 
-                                                            setState(() {
-                                                              getqtt('alfa22\$');
-                                                              getqtt('alfa\$\$\$');
-                                                            });
-                                                            Navigator.of(context)
-                                                                .pop();
-                                                          } else {
-                                                            _firestore
-                                                                .collection(
-                                                                'transaction')
-                                                                .add({
-                                                              'name':
-                                                              ListOfPhones[index]
-                                                              ['phonename'],
-                                                              'qtt': (_n-0.4),
-                                                              'price': _price,
-                                                              'timestamp':
-                                                              DateTime.now(),
-                                                              'currency': currency,
-                                                            });
-                                                            setState(() {
-                                                              getqtt(
-                                                                  ListOfPhones[index]
-                                                                  ['phonename']);
-                                                            });
-                                                            Navigator.of(context)
-                                                                .pop();
-                                                          }
-                                                        }
-
-
-                                                        else {
-                                                          _firestore
-                                                              .collection(
-                                                              'transaction')
-                                                              .add({
-                                                            'name':
-                                                            ListOfPhones[index]
-                                                            ['phonename'],
-                                                            'qtt': _n,
-                                                            'price': _price,
-                                                            'timestamp':
-                                                            DateTime.now(),
-                                                            'currency': currency,
-                                                          });
-                                                          setState(() {
-                                                            getqtt(
-                                                                ListOfPhones[index]
-                                                                ['phonename']);
-                                                          });
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        }
+//                                                        if (ListOfPhones[index]
+//                                                        ['phonename'] ==
+//                                                            'alfa Days' ||
+//                                                            ListOfPhones[index]
+//                                                            ['phonename'] ==
+//                                                                'alfa\$\$\$') {
+//                                                          if (ListOfPhones[index]
+//                                                          ['phonename'] ==
+//                                                              'alfa Days') {
+//                                                            _firestore
+//                                                                .collection(
+//                                                                'transaction')
+//                                                                .add({
+//                                                              'name': 'alfa22\$',
+//                                                              'qtt': -1.0,
+//                                                              'price': _price,
+//                                                              'timestamp':
+//                                                              DateTime.now(),
+//                                                              'currency': currency,
+//                                                            });
+//                                                            _firestore
+//                                                                .collection(
+//                                                                'transaction')
+//                                                                .add({
+//                                                              'name': 'alfa\$\$\$',
+//                                                              'qtt': -(_n),
+//                                                              'timestamp':
+//                                                              DateTime.now(),
+//                                                            });
+//
+//                                                            setState(() {
+//                                                              getqtt('alfa22\$');
+//                                                              getqtt('alfa\$\$\$');
+//                                                            });
+//                                                            Navigator.of(context)
+//                                                                .pop();
+//                                                          } else {
+//                                                            _firestore
+//                                                                .collection(
+//                                                                'transaction')
+//                                                                .add({
+//                                                              'name':
+//                                                              ListOfPhones[index]
+//                                                              ['phonename'],
+//                                                              'qtt': (_n-0.4),
+//                                                              'price': _price,
+//                                                              'timestamp':
+//                                                              DateTime.now(),
+//                                                              'currency': currency,
+//                                                            });
+//                                                            setState(() {
+//                                                              getqtt(
+//                                                                  ListOfPhones[index]
+//                                                                  ['phonename']);
+//                                                            });
+//                                                            Navigator.of(context)
+//                                                                .pop();
+//                                                          }
+//                                                        }
+//
+//
+//                                                        else {
+//                                                          _firestore
+//                                                              .collection(
+//                                                              'transaction')
+//                                                              .add({
+//                                                            'name':
+//                                                            ListOfPhones[index]
+//                                                            ['phonename'],
+//                                                            'qtt': _n,
+//                                                            'price': _price,
+//                                                            'timestamp':
+//                                                            DateTime.now(),
+//                                                            'currency': currency,
+//                                                          });
+//                                                          setState(() {
+//                                                            getqtt(
+//                                                                ListOfPhones[index]
+//                                                                ['phonename']);
+//                                                          });
+//                                                          Navigator.of(context)
+//                                                              .pop();
+//                                                        }
                                                       },
                                                     ),
                                                   ),

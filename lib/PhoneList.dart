@@ -427,23 +427,58 @@ class _PhonesListState extends State<PhonesList> {
                                               child: MaterialButton(
                                                 child: Text('Sell',style: TextStyle(fontSize: 30,color: Colors.black,fontWeight: FontWeight.bold),),
                                                 onPressed: () {
-                                                  _firestore
-                                                      .collection(
-                                                      'transaction')
-                                                      .add({
-                                                    'name':
-                                                    ListOfPhones[index]['phonename'],
-                                                    'qtt': _n,
-                                                    'price': _price,
-                                                    'timestamp':
-                                                    DateTime.now(),
-                                                    'currency': currency,
-                                                  });
-                                                  setState(() {
-                                                    getqtt(ListOfPhones[index]['phonename']);
-                                                  });
+                                                  return showDialog(
+                                                    context: context,
+                                                    builder:(BuildContext context) {
+                                                     return AlertDialog(
+                                                        title: Text(
+                                                            'Are You Sure to Sell ${ListOfPhones[index]
+                                                            ['phonename']}'),
+                                                        actions: <Widget>[
+                                                          MaterialButton(
+                                                            child: Text(
+                                                                'cancel'),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                  context)
+                                                                  .pop();
+                                                            },
+                                                          ),
+                                                          MaterialButton(
+                                                            child: Text('yes'),
+                                                            onPressed: () {
+                                                              _firestore
+                                                                  .collection(
+                                                                  'transaction')
+                                                                  .add({
+                                                                'name':
+                                                                ListOfPhones[index]['phonename'],
+                                                                'qtt': _n,
+                                                                'price': _price,
+                                                                'timestamp':
+                                                                DateTime.now(),
+                                                                'currency': currency,
+                                                              });
+                                                              setState(() {
+                                                                getqtt(
+                                                                    ListOfPhones[index]['phonename']);
+                                                              });
+                                                              Navigator.of(
+                                                                  context)
+                                                                  .pop();
+                                                              Navigator.of(
+                                                                  context)
+                                                                  .pop();
+                                                            },
+                                                          ),
 
-                                                  Navigator.of(context).pop();
+
+                                                        ],
+                                                      );
+
+                                                    }
+                                                  );
+
 
                                                 },
                                               ),

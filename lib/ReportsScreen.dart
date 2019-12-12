@@ -3,6 +3,8 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:esc_pos_printer/esc_pos_printer.dart';
 
 var now = new DateTime.now();
 int day = now.day;
@@ -160,6 +162,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    now = DateTime.now();
     gettransactiondate(startDate, endDate);
     getmaintenance(startDate, endDate, 'maintenance', Mtransaction);
     getmaintenance(startDate, endDate, 'spending', Stransaction);
@@ -182,7 +185,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           child: Column(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                padding: const EdgeInsets.only(right: 20, left: 20, top: 20),
                 child: Card(
                   color: Colors.white.withOpacity(0.0),
                   elevation: 20,
@@ -243,7 +246,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                padding: const EdgeInsets.only(right: 20, left: 20, top: 20),
                 child: Card(
                   color: Colors.white.withOpacity(0.0),
                   elevation: 20,
@@ -364,7 +367,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(right: 20,left: 20,top: 20),
+                padding: const EdgeInsets.only(right: 20, left: 20, top: 20),
                 child: Card(
                   color: Colors.white.withOpacity(0.0),
                   elevation: 20,
@@ -565,25 +568,60 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                   itemBuilder: (BuildContext cntxt, int index) {
                                     return Dismissible(
                                       background: Material(
-                                        color: Colors.red,
-                                      ),
+                                          color: Colors.red,
+                                          child: Center(
+                                            child: Stack(
+                                              children: <Widget>[
+                                                Positioned(
+                                                    right: 8,
+                                                    top: 15,
+                                                    child: Center(
+                                                        child: Text(
+                                                      'Delete',
+                                                      style: TextStyle(
+                                                          color: Colors.white),
+                                                    ))),
+                                              ],
+                                            ),
+                                          )),
                                       onDismissed:
-                                          (DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
-
-                                        print('${transaction[index]['id']}');
-                                        print(transaction[index]);
-                                        await _firestore
-                                            .collection('transaction')
-                                            .document(
-                                                '${transaction[index]['id']}')
-                                            .delete();
-                                        gettransactiondate(startDate, endDate);
-                                        transaction.remove(transaction[index]);
+                                          (DismissDirection direction) {
+                                        return showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Are You Sure To delete ?'),
+                                                actions: <Widget>[
+                                                  MaterialButton(
+                                                    child: Text('Cancel'),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                  MaterialButton(
+                                                    child: Text('Yes'),
+                                                    onPressed: () async {
+                                                      print(
+                                                          '${transaction[index]['id']}');
+                                                      print(transaction[index]);
+                                                      await _firestore
+                                                          .collection(
+                                                              'transaction')
+                                                          .document(
+                                                              '${transaction[index]['id']}')
+                                                          .delete();
+                                                      gettransactiondate(
+                                                          startDate, endDate);
+                                                      transaction.remove(
+                                                          transaction[index]);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  )
+                                                ],
+                                              );
+                                            });
                                       },
                                       key: Key(transaction[index].toString()),
                                       child: Card(
@@ -606,32 +644,36 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(
+                                                  child: AutoSizeText(
                                                     '${transaction[index]['name'].toString()}',
                                                     style: TextStyle(
-                                                        color: Colors.green,
-                                                        fontSize: 10),
+                                                      color: Colors.green,
+                                                    ),
+                                                    minFontSize: 5,
                                                   ),
                                                 ),
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
                                                   color: Colors.black,
                                                 )),
-                                                width: 70,
+                                                width: 60,
+                                                height: 30,
                                               ),
                                               Container(
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
                                                         color: Colors.black)),
-                                                width: 70,
+                                                width: 60,
+                                                height: 30,
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(
+                                                  child: AutoSizeText(
                                                     '${transaction[index]['price'].toString()}',
                                                     style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontSize: 10),
+                                                      color: Colors.red,
+                                                    ),
+                                                    minFontSize: 5,
                                                   ),
                                                 ),
                                               ),
@@ -639,16 +681,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                                 decoration: BoxDecoration(
                                                     border: Border.all(
                                                         color: Colors.black)),
-                                                width: 50,
+                                                width: 30,
+                                                height: 30,
                                                 child: Padding(
                                                   padding:
                                                       const EdgeInsets.all(8.0),
-                                                  child: Text(
+                                                  child: AutoSizeText(
                                                     '${transaction[index]['curency'].toString()}',
                                                     style: TextStyle(
-                                                        color:
-                                                            Colors.blueAccent,
-                                                        fontSize: 10),
+                                                      color: Colors.blueAccent,
+                                                    ),
+                                                    minFontSize: 5,
+                                                  ),
+                                                ),
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: Colors.black)),
+                                                width: 40,
+                                                height: 30,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: AutoSizeText(
+                                                    '${(-transaction[index]['qtt']).toString()}',
+                                                    style: TextStyle(
+                                                      color: Colors.blueAccent,
+                                                    ),
+                                                    minFontSize: 5,
                                                   ),
                                                 ),
                                               ),
@@ -694,16 +755,42 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                         color: Colors.red,
                                       ),
                                       onDismissed:
-                                          (DismissDirection direction) async {
-                                        await _firestore
-                                            .collection('others')
-                                            .document(
-                                                '${Mtransaction[index]['id']}')
-                                            .delete();
-                                        getmaintenance(startDate, endDate,
-                                            'maintenance', Mtransaction);
-                                        Mtransaction.remove(
-                                            Mtransaction[index]);
+                                          (DismissDirection direction) {
+                                        return showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Are You Sure To delete ?'),
+                                                actions: <Widget>[
+                                                  MaterialButton(
+                                                    child: Text('Cancel'),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                  MaterialButton(
+                                                    child: Text('Yes'),
+                                                    onPressed: () async {
+                                                      await _firestore
+                                                          .collection('others')
+                                                          .document(
+                                                              '${Mtransaction[index]['id']}')
+                                                          .delete();
+                                                      getmaintenance(
+                                                          startDate,
+                                                          endDate,
+                                                          'maintenance',
+                                                          Mtransaction);
+                                                      Mtransaction.remove(
+                                                          Mtransaction[index]);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  )
+                                                ],
+                                              );
+                                            });
                                       },
                                       key: Key(Mtransaction[index].toString()),
                                       child: Card(
@@ -796,16 +883,52 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                         color: Colors.red,
                                       ),
                                       onDismissed:
-                                          (DismissDirection direction) async {
-                                        await _firestore
-                                            .collection('others')
-                                            .document(
-                                                '${Stransaction[index]['id']}')
-                                            .delete();
-                                        getmaintenance(startDate, endDate,
-                                            'spending', Stransaction);
-                                        Stransaction.remove(
-                                            Stransaction[index]);
+                                          (DismissDirection direction) {
+                                        return showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Are You Sure To delete ?'),
+                                                actions: <Widget>[
+                                                  MaterialButton(
+                                                    child: Text('Cancel'),
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                    },
+                                                  ),
+                                                  MaterialButton(
+                                                    child: Text('Yes'),
+                                                    onPressed: () async {
+                                                      await _firestore
+                                                          .collection('others')
+                                                          .document(
+                                                              '${Stransaction[index]['id']}')
+                                                          .delete();
+                                                      getmaintenance(
+                                                          startDate,
+                                                          endDate,
+                                                          'spending',
+                                                          Stransaction);
+                                                      Stransaction.remove(
+                                                          Stransaction[index]);
+                                                      Navigator.of(context).pop();
+                                                    },
+                                                  )
+                                                ],
+                                              );
+                                            });
+
+//                                        await _firestore
+//                                            .collection('others')
+//                                            .document(
+//                                                '${Stransaction[index]['id']}')
+//                                            .delete();
+//                                        getmaintenance(startDate, endDate,
+//                                            'spending', Stransaction);
+//                                        Stransaction.remove(
+//                                            Stransaction[index]);
                                       },
                                       key: Key(Stransaction[index].toString()),
                                       child: Card(
@@ -877,6 +1000,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ),
                 ),
               ),
+              MaterialButton(
+                child: Text('Print'),
+                onPressed: () {
+                  Printer.connect('192.168.168.6', port: 9100)
+                      .then((printer) {});
+                },
+              )
             ],
           ),
         ));

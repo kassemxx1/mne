@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'constants.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 final _firestore = Firestore.instance;
 FirebaseStorage _storage = FirebaseStorage.instance;
 
@@ -23,18 +25,15 @@ class _MtcScreenState extends State<MtcScreen> {
   var upload = 'Choose the Item Image';
   var nameOfItem = '';
   var PriceOfItem = '';
-  bool _saving=true;
-
-  Future delay() async{
-    await new Future.delayed(new Duration(seconds: 5), ()
-    {
+  bool _saving = true;
+  var cost = 0.45;
+  Future delay() async {
+    await new Future.delayed(new Duration(seconds: 5), () {
       setState(() {
-        _saving=false;
+        _saving = false;
       });
-
     });
   }
-
 
   Future<String> uploadPic() async {
     //Get the file from the image picker and store it
@@ -49,7 +48,7 @@ class _MtcScreenState extends State<MtcScreen> {
     // Waits till the file is uploaded then stores the download url
     String location =
         await (await uploadTask.onComplete).ref.getDownloadURL() as String;
-    print(location);
+
     setState(() {
       upload = 'Uploade';
       ImageLink = location;
@@ -72,7 +71,7 @@ class _MtcScreenState extends State<MtcScreen> {
       final image = msg['image'].toString();
       setState(() {
         ListOfPhones.add({'phonename': name, 'price': price, 'image': image});
-        _saving=false;
+        _saving = false;
       });
     }
   }
@@ -99,7 +98,6 @@ class _MtcScreenState extends State<MtcScreen> {
     super.initState();
     getPhonesList();
     delay();
-
   }
 
   @override
@@ -131,7 +129,6 @@ class _MtcScreenState extends State<MtcScreen> {
                         child: Card(
                           elevation: 20,
                           color: Colors.white,
-                          
                           child: Container(
                             child: Column(
                               children: <Widget>[
@@ -148,8 +145,8 @@ class _MtcScreenState extends State<MtcScreen> {
                                 ),
                                 Text(
                                   '${ListOfPhones[index]['price'].toString()} \$',
-                                  style:
-                                      TextStyle(fontSize: 16, color: Colors.green),
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.green),
                                 ),
                                 FutureBuilder(
                                     builder: (BuildContext context,
@@ -161,7 +158,7 @@ class _MtcScreenState extends State<MtcScreen> {
                                           children: <Widget>[
                                             Text('Available:'),
                                             Text(
-                                              '${ListOfPhones[index]['phonename']=='mtc\$\$\$'?qttnumbr.data.toStringAsFixed(2):qttnumbr.data.round()}',
+                                              '${ListOfPhones[index]['phonename'] == 'mtc\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   color: Colors.blueAccent),
@@ -171,8 +168,8 @@ class _MtcScreenState extends State<MtcScreen> {
                                       );
                                     },
                                     initialData: 0.0,
-                                    future:
-                                        getqtt(ListOfPhones[index]['phonename'])),
+                                    future: getqtt(
+                                        ListOfPhones[index]['phonename'])),
                                 MaterialButton(
                                   child: Text(
                                     'Sell',
@@ -185,6 +182,7 @@ class _MtcScreenState extends State<MtcScreen> {
                                     var _n = -1.0;
                                     var _price = 0.0;
                                     var currency = 'L.L';
+
                                     showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
@@ -214,14 +212,15 @@ class _MtcScreenState extends State<MtcScreen> {
                                                     '${ListOfPhones[index]['price'].toString()} \$',
                                                     style: TextStyle(
                                                         fontSize: 20,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         color: Colors.green),
                                                   ),
                                                   FutureBuilder(
-                                                      builder:
-                                                          (BuildContext context,
-                                                              AsyncSnapshot<double>
-                                                                  qttnumbr) {
+                                                      builder: (BuildContext
+                                                              context,
+                                                          AsyncSnapshot<double>
+                                                              qttnumbr) {
                                                         return Center(
                                                           child: Text(
                                                             'Available : ${qttnumbr.data}',
@@ -233,14 +232,17 @@ class _MtcScreenState extends State<MtcScreen> {
                                                           ListOfPhones[index]
                                                               ['phonename'])),
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 40,
-                                                        right: 40,
-                                                        top: 10),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 40,
+                                                            right: 40,
+                                                            top: 10),
                                                     child: TextField(
-                                                      keyboardType: TextInputType
-                                                          .emailAddress,
-                                                      textAlign: TextAlign.center,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .emailAddress,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       onChanged: (value) {
                                                         setState(() {
                                                           _n = -(double.parse(
@@ -255,18 +257,22 @@ class _MtcScreenState extends State<MtcScreen> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        left: 40,
-                                                        right: 40,
-                                                        top: 10),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 40,
+                                                            right: 40,
+                                                            top: 10),
                                                     child: TextField(
-                                                      keyboardType: TextInputType
-                                                          .emailAddress,
-                                                      textAlign: TextAlign.center,
+                                                      keyboardType:
+                                                          TextInputType
+                                                              .emailAddress,
+                                                      textAlign:
+                                                          TextAlign.center,
                                                       onChanged: (value) {
                                                         setState(() {
                                                           _price =
-                                                              (double.parse(value));
+                                                              (double.parse(
+                                                                  value));
                                                         });
                                                       },
                                                       decoration:
@@ -278,12 +284,13 @@ class _MtcScreenState extends State<MtcScreen> {
                                                   ),
                                                   Padding(
                                                     padding:
-                                                        const EdgeInsets.all(8.0),
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: CustomRadioButton(
-                                                      buttonColor: Theme.of(context)
-                                                          .canvasColor,
+                                                      buttonColor:
+                                                          Theme.of(context)
+                                                              .canvasColor,
                                                       buttonLables: [
-
                                                         'L.L',
                                                         '\$',
                                                       ],
@@ -291,7 +298,8 @@ class _MtcScreenState extends State<MtcScreen> {
                                                         'L.L',
                                                         '\$',
                                                       ],
-                                                      radioButtonValue: (value) {
+                                                      radioButtonValue:
+                                                          (value) {
                                                         setState(() {
                                                           currency = value;
                                                         });
@@ -302,108 +310,309 @@ class _MtcScreenState extends State<MtcScreen> {
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets.only(
-                                                        top: 10, bottom: 10),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 10,
+                                                            bottom: 10),
                                                     child: MaterialButton(
                                                       child: Text(
                                                         'Sell',
                                                         style: TextStyle(
                                                             fontSize: 30,
-                                                            color:
-                                                                Colors.blueAccent,
+                                                            color: Colors
+                                                                .blueAccent,
                                                             fontWeight:
-                                                                FontWeight.bold),
+                                                                FontWeight
+                                                                    .bold),
                                                       ),
                                                       onPressed: () {
-                                                        if (ListOfPhones[index]
-                                                                    ['phonename'] ==
-                                                                'mtc\$\$\$' ||
-                                                            ListOfPhones[index]
-                                                                    ['phonename'] ==
-                                                                'mtc Days') {
-                                                          if (ListOfPhones[index]
-                                                                  ['phonename'] ==
-                                                              'mtc\$\$\$') {
-                                                            _firestore
-                                                                .collection(
-                                                                'transaction')
-                                                                .add({
-                                                              'name':
-                                                              ListOfPhones[index]
-                                                              ['phonename'],
-                                                              'qtt': (_n-0.45),
-                                                              'price': _price,
-                                                              'timestamp':
-                                                              DateTime.now(),
-                                                              'currency': currency,
+                                                        return showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return AlertDialog(
+                                                                title: Text(
+                                                                    'Are You Sure to Sell ${-_n} ${ListOfPhones[index]['phonename']}?'),
+                                                                actions: <
+                                                                    Widget>[
+                                                                  MaterialButton(
+                                                                    child: Text(
+                                                                        'cancel'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop();
+                                                                    },
+                                                                  ),
+                                                                  MaterialButton(
+                                                                    child: Text(
+                                                                        'yes'),
+                                                                    onPressed:
+                                                                        () {
+                                                                      if (ListOfPhones[index]['phonename'] ==
+                                                                              'mtc\$\$\$' ||
+                                                                          ListOfPhones[index]['phonename'] ==
+                                                                              'mtc Days') {
+                                                                        if (ListOfPhones[index]['phonename'] ==
+                                                                            'mtc\$\$\$') {
+                                                                          if (-_n > 10.0 &&
+                                                                              -_n < 20.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 0.9),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 20.0 &&
+                                                                              -_n < 30.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 1.35),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 30.0 &&
+                                                                              -_n < 40.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 1.8),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 40.0 &&
+                                                                              -_n < 50.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 2.25),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 50.0 &&
+                                                                              -_n < 60.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 2.7),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 60.0 &&
+                                                                              -_n < 70.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - 3.15),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+                                                                          if (-_n > 00.0 &&
+                                                                              -_n < 10.0) {
+                                                                            //                                                                          _firestore
+                                                                            _firestore.collection('transaction').add({
+                                                                              'name': ListOfPhones[index]['phonename'],
+                                                                              'qtt': (_n - .45),
+                                                                              'price': _price,
+                                                                              'timestamp': DateTime.now(),
+                                                                              'currency': currency,
+                                                                            });
+                                                                          }
+
+//                                                                          _firestore
+//                                                                              .collection('transaction')
+//                                                                              .add({
+//                                                                            'name':
+//                                                                                ListOfPhones[index]['phonename'],
+//                                                                            'qtt':
+//                                                                                (_n - cost),
+//                                                                            'price':
+//                                                                                _price,
+//                                                                            'timestamp':
+//                                                                                DateTime.now(),
+//                                                                            'currency':
+//                                                                                currency,
+//                                                                          });
+
+                                                                          setState(
+                                                                              () {
+                                                                            getqtt(ListOfPhones[index]['phonename']);
+                                                                          });
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        } else {
+                                                                          _firestore
+                                                                              .collection('transaction')
+                                                                              .add({
+                                                                            'name':
+                                                                                'mtc 22\$',
+                                                                            'qtt':
+                                                                                -1.0,
+                                                                            'price':
+                                                                                _price,
+                                                                            'timestamp':
+                                                                                DateTime.now(),
+                                                                            'currency':
+                                                                                currency,
+                                                                          });
+                                                                          _firestore
+                                                                              .collection('transaction')
+                                                                              .add({
+                                                                            'name':
+                                                                                'mtc\$\$\$',
+                                                                            'qtt':
+                                                                                -(_n),
+                                                                            'timestamp':
+                                                                                DateTime.now(),
+                                                                          });
+
+                                                                          setState(
+                                                                              () {
+                                                                            getqtt('mtc 22\$');
+                                                                            getqtt('mtc\$\$\$');
+                                                                          });
+                                                                          Navigator.of(context)
+                                                                              .pop();
+                                                                        }
+                                                                      } else {
+                                                                        _firestore
+                                                                            .collection('transaction')
+                                                                            .add({
+                                                                          'name':
+                                                                              ListOfPhones[index]['phonename'],
+                                                                          'qtt':
+                                                                              _n,
+                                                                          'price':
+                                                                              _price,
+                                                                          'timestamp':
+                                                                              DateTime.now(),
+                                                                          'currency':
+                                                                              currency,
+                                                                        });
+                                                                        setState(
+                                                                            () {
+                                                                          getqtt(ListOfPhones[index]
+                                                                              [
+                                                                              'phonename']);
+                                                                        });
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                        Navigator.of(context)
+                                                                            .pop();
+                                                                      }
+                                                                    },
+                                                                  )
+                                                                ],
+                                                              );
                                                             });
-                                                            setState(() {
-                                                              getqtt(
-                                                                  ListOfPhones[index]
-                                                                  ['phonename']);
-                                                            });
-                                                            Navigator.of(context)
-                                                                .pop();
-                                                          }
 
-
-
-                                                          else {
-                                                            _firestore
-                                                                .collection(
-                                                                    'transaction')
-                                                                .add({
-                                                              'name': 'mtc 22\$',
-                                                              'qtt': -1.0,
-                                                              'price': _price,
-                                                              'timestamp':
-                                                                  DateTime.now(),
-                                                              'currency': currency,
-                                                            });
-                                                            _firestore
-                                                                .collection(
-                                                                    'transaction')
-                                                                .add({
-                                                              'name': 'mtc\$\$\$',
-                                                              'qtt': -(_n),
-                                                              'timestamp':
-                                                                  DateTime.now(),
-                                                            });
-
-                                                            setState(() {
-                                                              getqtt('mtc 22\$');
-                                                              getqtt('mtc\$\$\$');
-                                                            });
-                                                            Navigator.of(context)
-                                                                .pop();
-                                                          }
-
-                                                        }
-
-
-
-                                                        else {
-                                                          _firestore
-                                                              .collection(
-                                                                  'transaction')
-                                                              .add({
-                                                            'name':
-                                                                ListOfPhones[index]
-                                                                    ['phonename'],
-                                                            'qtt': _n,
-                                                            'price': _price,
-                                                            'timestamp':
-                                                                DateTime.now(),
-                                                            'currency': currency,
-                                                          });
-                                                          setState(() {
-                                                            getqtt(
-                                                                ListOfPhones[index]
-                                                                    ['phonename']);
-                                                          });
-                                                          Navigator.of(context)
-                                                              .pop();
-                                                        }
+//                                                        if (ListOfPhones[index]
+//                                                                    ['phonename'] ==
+//                                                                'mtc\$\$\$' ||
+//                                                            ListOfPhones[index]
+//                                                                    ['phonename'] ==
+//                                                                'mtc Days') {
+//                                                          if (ListOfPhones[index]
+//                                                                  ['phonename'] ==
+//                                                              'mtc\$\$\$') {
+//                                                            _firestore
+//                                                                .collection(
+//                                                                'transaction')
+//                                                                .add({
+//                                                              'name':
+//                                                              ListOfPhones[index]
+//                                                              ['phonename'],
+//                                                              'qtt': (_n-0.45),
+//                                                              'price': _price,
+//                                                              'timestamp':
+//                                                              DateTime.now(),
+//                                                              'currency': currency,
+//                                                            });
+//                                                            setState(() {
+//                                                              getqtt(
+//                                                                  ListOfPhones[index]
+//                                                                  ['phonename']);
+//                                                            });
+//                                                            Navigator.of(context)
+//                                                                .pop();
+//                                                          }
+//
+//
+//
+//                                                          else {
+//                                                            _firestore
+//                                                                .collection(
+//                                                                    'transaction')
+//                                                                .add({
+//                                                              'name': 'mtc 22\$',
+//                                                              'qtt': -1.0,
+//                                                              'price': _price,
+//                                                              'timestamp':
+//                                                                  DateTime.now(),
+//                                                              'currency': currency,
+//                                                            });
+//                                                            _firestore
+//                                                                .collection(
+//                                                                    'transaction')
+//                                                                .add({
+//                                                              'name': 'mtc\$\$\$',
+//                                                              'qtt': -(_n),
+//                                                              'timestamp':
+//                                                                  DateTime.now(),
+//                                                            });
+//
+//                                                            setState(() {
+//                                                              getqtt('mtc 22\$');
+//                                                              getqtt('mtc\$\$\$');
+//                                                            });
+//                                                            Navigator.of(context)
+//                                                                .pop();
+//                                                          }
+//
+//                                                        }
+//
+//
+//
+//                                                        else {
+//                                                          _firestore
+//                                                              .collection(
+//                                                                  'transaction')
+//                                                              .add({
+//                                                            'name':
+//                                                                ListOfPhones[index]
+//                                                                    ['phonename'],
+//                                                            'qtt': _n,
+//                                                            'price': _price,
+//                                                            'timestamp':
+//                                                                DateTime.now(),
+//                                                            'currency': currency,
+//                                                          });
+//                                                          setState(() {
+//                                                            getqtt(
+//                                                                ListOfPhones[index]
+//                                                                    ['phonename']);
+//                                                          });
+//                                                          Navigator.of(context)
+//                                                              .pop();
+//                                                        }
                                                       },
                                                     ),
                                                   ),

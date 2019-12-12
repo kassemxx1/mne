@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'constants.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
-import 'Rounded_Button.dart';
 import 'package:date_format/date_format.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 final _firestore = Firestore.instance;
@@ -492,22 +491,49 @@ class _OMTScreenState extends State<OMTScreen> {
                                             color: Colors.red,
                                           ),
                                           onDismissed: (
-                                              DismissDirection direction) async {
+                                              DismissDirection direction)  {
+                                            return showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        'Are You Sure To delete ?'),
+                                                    actions: <Widget>[
+                                                      MaterialButton(
+                                                        child: Text('Cancel'),
+                                                        onPressed: () {
+                                                          Navigator.of(context)
+                                                              .pop();
+                                                        },
+                                                      ),
+                                                      MaterialButton(
+                                                        child: Text('Yes'),
+                                                        onPressed: () async {
+                                                          print('${transaction[index]['id']}');
+                                                          print(transaction[index]);
+                                                          await _firestore.collection('omt')
+                                                              .document(
+                                                              '${transaction[index]['id']}')
+                                                              .delete();
+                                                          gettransaction();
+                                                          transaction.remove(
+                                                              transaction[index]);
+                                                        },
+                                                      )
+                                                    ],
+                                                  );
+                                                });
+
+
+
+
 //                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
 //                                      for (DocumentSnapshot ds in snapshot.documents){
 //                                        ds.reference.delete();
 //                                      });
 //                                    }
 
-                                            print('${transaction[index]['id']}');
-                                            print(transaction[index]);
-                                            await _firestore.collection('omt')
-                                                .document(
-                                                '${transaction[index]['id']}')
-                                                .delete();
-                                            gettransaction();
-                                            transaction.remove(
-                                                transaction[index]);
+
                                           },
                                           key: Key(transaction[index].toString()),
 
@@ -666,22 +692,42 @@ class _OMTScreenState extends State<OMTScreen> {
                                                       color: Colors.red,
                                                     ),
                                                     onDismissed: (
-                                                        DismissDirection direction) async {
-//                                    await _firestore.collection('messages').getDocuments().then((snapshot) {
-//                                      for (DocumentSnapshot ds in snapshot.documents){
-//                                        ds.reference.delete();
-//                                      });
-//                                    }
+                                                        DismissDirection direction)  {
 
-                                                      print('${transaction[index]['id']}');
-                                                      print(transaction[index]);
-                                                      await _firestore.collection('omt')
-                                                          .document(
-                                                          '${transaction[index]['id']}')
-                                                          .delete();
-                                                      gettransaction();
-                                                      transaction.remove(
-                                                          transaction[index]);
+                                                      return showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext context) {
+                                                            return AlertDialog(
+                                                              title: Text(
+                                                                  'Are You Sure To delete ?'),
+                                                              actions: <Widget>[
+                                                                MaterialButton(
+                                                                  child: Text('Cancel'),
+                                                                  onPressed: () {
+                                                                    Navigator.of(context)
+                                                                        .pop();
+                                                                  },
+                                                                ),
+                                                                MaterialButton(
+                                                                  child: Text('Yes'),
+                                                                  onPressed: () async {
+                                                                    print('${transaction[index]['id']}');
+                                                                    print(transaction[index]);
+                                                                    await _firestore.collection('omt')
+                                                                        .document(
+                                                                        '${transaction[index]['id']}')
+                                                                        .delete();
+                                                                    gettransaction();
+                                                                    transaction.remove(
+                                                                        transaction[index]);
+                                                                  },
+                                                                )
+                                                              ],
+                                                            );
+                                                          });
+
+
+
                                                     },
                                                     key: Key(transaction[index].toString()),
 
