@@ -90,7 +90,7 @@ class _FanytelScreenState extends State<FanytelScreen> {
                               children: <Widget>[
                                 TextField(
                                   keyboardType: TextInputType
-                                      .number,
+                                      .numberWithOptions(decimal: true),
                                   textAlign: TextAlign.center,
                                   onChanged: (value) {
                                     setState(() {
@@ -140,7 +140,7 @@ class _FanytelScreenState extends State<FanytelScreen> {
                                   children: <Widget>[
                                     TextField(
                                       keyboardType: TextInputType
-                                          .number,
+                                          .numberWithOptions(decimal: true),
                                       textAlign: TextAlign.center,
                                       onChanged: (value) {
                                         setState(() {

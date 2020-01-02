@@ -13,7 +13,7 @@ class _phonecatState extends State<phonecat> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Categories',style: TextStyle(color: Colors.black),),
+          title: Text('Phones',style: TextStyle(color: Colors.black),),
           backgroundColor: Colors.yellow,
           leading: new IconButton(
             icon: new Icon(Icons.arrow_back, color: Colors.black54),

@@ -16,6 +16,11 @@ import 'phonecat.dart';
 import 'accessoriescat.dart';
 import 'EditItems.dart';
 import 'OthersScreen.dart';
+import 'Table_Screen.dart';
+import 'Report_Table.dart';
+import 'OMT_Table.dart';
+import 'ClientsTransactionTable.dart';
+import 'All_CLients.dart';
 void main() => runApp(phone_sotre());
 
 class phone_sotre extends StatefulWidget {
@@ -46,6 +51,13 @@ class _phone_sotreState extends State<phone_sotre> {
         accesscat.id:(context) =>accesscat(),
         EditItems.id:(context) =>EditItems(),
         OtherScrenn.id:(context) =>OtherScrenn(),
+        TableScreen.id:(context) =>TableScreen(),
+        ReportTable.id:(context) =>ReportTable(),
+        OmtTable.id:(context) =>OmtTable(),
+        ClientsTransactionTable.id:(context) =>ClientsTransactionTable(),
+        AllClients.id:(context) => AllClients(),
+
+
       },
     );
   }

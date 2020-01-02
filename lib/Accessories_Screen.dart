@@ -282,6 +282,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                           children: <Widget>[
                                             Expanded(
                                               child: Container(
+////
                                                 child: CachedNetworkImage(
                                                   imageUrl: ListOfPhones[index]
                                                       ['image'],
@@ -465,6 +466,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                                         child: Container(
                                           child: Padding(
                                             padding: const EdgeInsets.all(3.0),
+                                            //////
                                             child: CachedNetworkImage(
                                               imageUrl: ListOfPhones[index]
                                                   ['image'],

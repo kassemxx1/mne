@@ -164,6 +164,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
                               children: <Widget>[
                                 Expanded(
                                   child: Container(
+                                    //////
                                     child: CachedNetworkImage(
                                       imageUrl: ListOfPhones[index]['image'],
                                     ),
@@ -222,6 +223,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                 children: <Widget>[
                                                   Expanded(
                                                     child: Container(
+                                                      ////
                                                       child: CachedNetworkImage(
                                                         imageUrl:
                                                             ListOfPhones[index]
@@ -418,96 +420,115 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                                           });
                                                                           Navigator.of(context)
                                                                               .pop();
+                                                                          Navigator.of(context)
+                                                                              .pop();
                                                                         } else {
-                                                                          if (-_n > 10.0 &&
-                                                                              -_n < 20.0) {
+                                                                          if((_n/10).round() > _n/10){
+
                                                                             _firestore.collection('transaction').add({
+
                                                                               'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - .8),
+                                                                              'qtt': (_n + (((_n/10).round()-1)*0.45)),
                                                                               'price': _price,
                                                                               'timestamp': DateTime.now(),
                                                                               'currency': currency,
-                                                                            });
-                                                                          }
-                                                                          if (-_n > 20.0 &&
-                                                                              -_n < 30.0) {
-                                                                            _firestore.collection('transaction').add({
-                                                                              'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - 1.2),
-                                                                              'price': _price,
-                                                                              'timestamp': DateTime.now(),
-                                                                              'currency': currency,
-                                                                            });
-                                                                          }
-                                                                          if (-_n > 30.0 &&
-                                                                              -_n < 40.0) {
-                                                                            _firestore.collection('transaction').add({
-                                                                              'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - 1.6),
-                                                                              'price': _price,
-                                                                              'timestamp': DateTime.now(),
-                                                                              'currency': currency,
-                                                                            });
-                                                                            //                                                                          _firestore
+
+                                                                            }
+                                                                            );
+                                                                            print('yes yes');
 
                                                                           }
-                                                                          if (-_n > 40.0 &&
-                                                                              -_n < 50.0) {
+                                                                          else{
                                                                             _firestore.collection('transaction').add({
-                                                                              'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - 2.0),
-                                                                              'price': _price,
-                                                                              'timestamp': DateTime.now(),
-                                                                              'currency': currency,
-                                                                            });
-                                                                          }
-                                                                          if (-_n > 50.0 &&
-                                                                              -_n < 60.0) {
-                                                                            _firestore.collection('transaction').add({
-                                                                              'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - 2.4),
-                                                                              'price': _price,
-                                                                              'timestamp': DateTime.now(),
-                                                                              'currency': currency,
-                                                                            });
-                                                                            //                                                                          _firestore
 
-                                                                          }
-                                                                          if (-_n > 60.0 &&
-                                                                              -_n < 70.0) {
-                                                                            _firestore.collection('transaction').add({
                                                                               'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - 2.8),
+                                                                              'qtt': (_n + ((_n/10).round()*0.45)),
                                                                               'price': _price,
                                                                               'timestamp': DateTime.now(),
                                                                               'currency': currency,
+
                                                                             });
-                                                                          }
-                                                                          if (-_n > 00.0 &&
-                                                                              -_n < 10.0) {
-                                                                            _firestore.collection('transaction').add({
-                                                                              'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n - .4),
-                                                                              'price': _price,
-                                                                              'timestamp': DateTime.now(),
-                                                                              'currency': currency,
-                                                                            });
+                                                                            print('no no');
                                                                           }
 
-//                                                                          _firestore
-//                                                                              .collection('transaction')
-//                                                                              .add({
-//                                                                            'name':
-//                                                                                ListOfPhones[index]['phonename'],
-//                                                                            'qtt':
-//                                                                                (_n - msg),
-//                                                                            'price':
-//                                                                                _price,
-//                                                                            'timestamp':
-//                                                                                DateTime.now(),
-//                                                                            'currency':
-//                                                                                currency,
-//                                                                          });
+
+
+//                                                                          if (-_n > 10.0 &&
+//                                                                              -_n <= 20.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - .8),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                          }
+//                                                                          if (-_n > 20.0 &&
+//                                                                              -_n <= 30.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - 1.2),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                          }
+//                                                                          if (-_n > 30.0 &&
+//                                                                              -_n <= 40.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - 1.6),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                            //                                                                          _firestore
+//
+//                                                                          }
+//                                                                          if (-_n > 40.0 &&
+//                                                                              -_n <= 50.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - 2.0),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                          }
+//                                                                          if (-_n > 50.0 &&
+//                                                                              -_n <= 60.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - 2.4),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                            //                                                                          _firestore
+//
+//                                                                          }
+//                                                                          if (-_n > 60.0 &&
+//                                                                              -_n <= 70.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - 2.8),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                          }
+//                                                                          if (-_n > 00.0 &&
+//                                                                              -_n <= 10.0) {
+//                                                                            _firestore.collection('transaction').add({
+//                                                                              'name': ListOfPhones[index]['phonename'],
+//                                                                              'qtt': (_n - .4),
+//                                                                              'price': _price,
+//                                                                              'timestamp': DateTime.now(),
+//                                                                              'currency': currency,
+//                                                                            });
+//                                                                          }
+//
+
                                                                           setState(
                                                                               () {
                                                                             getqtt(ListOfPhones[index]['phonename']);

@@ -26,7 +26,7 @@ class _RechargeCategoriesState extends State<RechargeCategories> {
           color: Colors.white,
           child: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Flexible(
                   child: Padding(
