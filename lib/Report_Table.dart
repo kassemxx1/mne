@@ -100,7 +100,11 @@ class _ReportTableState extends State<ReportTable> {
                     label: Text(
                       'QTT',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                    )),
+                    ),
+                  numeric: true,
+
+                ),
+
                 DataColumn(
                     label: Text(
                       'Price',
@@ -124,6 +128,7 @@ class _ReportTableState extends State<ReportTable> {
               ],
               rows: child
                   .map((trans) => DataRow(
+
 
 //                            showDialog(
 //                                context: context,
@@ -180,14 +185,15 @@ class _ReportTableState extends State<ReportTable> {
                         style: TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold))),
-                    DataCell(Text(trans.Price!=null?'${trans.Price}':'\$ for You',
+                    DataCell(Text(trans.Price!=null?'${FlutterMoneyFormatter(amount: trans.Price).output.withoutFractionDigits}':'\$ for You',
                         style: TextStyle(
                             color: Colors.blue,
-                            fontWeight: FontWeight.bold))),
+                            fontWeight: FontWeight.bold)),
+                    ),
                     DataCell(trans.curremcy!=null?Text('${trans.curremcy}',
                         style: TextStyle(
                             color: Colors.blue,
-                            fontWeight: FontWeight.bold)):Text('🤪',style: TextStyle(fontSize: 25),)),
+                            fontWeight: FontWeight.bold)):Text('Days',style: TextStyle(fontSize: 25),)),
                     DataCell(Text(trans.client!=null?'${trans.client}':'---',
                         style: TextStyle(
                             color: Colors.blue,
@@ -224,6 +230,7 @@ class _ReportTableState extends State<ReportTable> {
                         )),
                   ]))
                   .toList(),
+
             ),
           ),
         ),

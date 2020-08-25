@@ -107,21 +107,21 @@ class _AlfaScreenState extends State<AlfaScreen> {
     }
   }
 
-  Future<double> getqtt(String name) async {
-    var qtts = [0.0];
-
-    final messages = await _firestore
-        .collection('transaction')
-        .where('name', isEqualTo: name)
-        .getDocuments();
-    for (var msg in messages.documents) {
-      final qtt = msg['qtt'];
-      qtts.add(qtt.toDouble());
-    }
-
-    var result = qtts.reduce((sum, element) => sum + element);
-    return new Future(() => result.toDouble());
-  }
+//  Future<double> getqtt(String name) async {
+//    var qtts = [0.0];
+//
+//    final messages = await _firestore
+//        .collection('transaction')
+//        .where('name', isEqualTo: name)
+//        .getDocuments();
+//    for (var msg in messages.documents) {
+//      final qtt = msg['qtt'];
+//      qtts.add(qtt.toDouble());
+//    }
+//
+//    var result = qtts.reduce((sum, element) => sum + element);
+//    return new Future(() => result.toDouble());
+//  }
 
   @override
   void initState() {
@@ -179,28 +179,28 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                   style: TextStyle(
                                       fontSize: 16, color: Colors.green),
                                 ),
-                                FutureBuilder(
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<double> qttnumbr) {
-                                      return Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text('Available:'),
-                                            Text(
-                                              '${ListOfPhones[index]['phonename'] == 'alfa\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.blueAccent),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    initialData: 0.0,
-                                    future: getqtt(
-                                        ListOfPhones[index]['phonename'])),
+//                                FutureBuilder(
+//                                    builder: (BuildContext context,
+//                                        AsyncSnapshot<double> qttnumbr) {
+//                                      return Center(
+//                                        child: Row(
+//                                          mainAxisAlignment:
+//                                              MainAxisAlignment.center,
+//                                          children: <Widget>[
+//                                            Text('Available:'),
+//                                            Text(
+//                                              '${ListOfPhones[index]['phonename'] == 'alfa\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
+//                                              style: TextStyle(
+//                                                  fontSize: 16,
+//                                                  color: Colors.blueAccent),
+//                                            ),
+//                                          ],
+//                                        ),
+//                                      );
+//                                    },
+//                                    initialData: 0.0,
+//                                    future: getqtt(
+//                                        ListOfPhones[index]['phonename'])),
                                 MaterialButton(
                                   child: Text(
                                     'Sell',
@@ -247,21 +247,21 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                             FontWeight.bold,
                                                         color: Colors.green),
                                                   ),
-                                                  FutureBuilder(
-                                                      builder: (BuildContext
-                                                              context,
-                                                          AsyncSnapshot<double>
-                                                              qttnumbr) {
-                                                        return Center(
-                                                          child: Text(
-                                                            'Available : ${qttnumbr.data}',
-                                                          ),
-                                                        );
-                                                      },
-                                                      initialData: 1.0,
-                                                      future: getqtt(
-                                                          ListOfPhones[index]
-                                                              ['phonename'])),
+//                                                  FutureBuilder(
+//                                                      builder: (BuildContext
+//                                                              context,
+//                                                          AsyncSnapshot<double>
+//                                                              qttnumbr) {
+//                                                        return Center(
+//                                                          child: Text(
+//                                                            'Available : ${qttnumbr.data}',
+//                                                          ),
+//                                                        );
+//                                                      },
+//                                                      initialData: 1.0,
+//                                                      future: getqtt(
+//                                                          ListOfPhones[index]
+//                                                              ['phonename'])),
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -415,8 +415,8 @@ class _AlfaScreenState extends State<AlfaScreen> {
 
                                                                           setState(
                                                                               () {
-                                                                            getqtt('alfa22\$');
-                                                                            getqtt('alfa\$\$\$');
+//                                                                            getqtt('alfa22\$');
+//                                                                            getqtt('alfa\$\$\$');
                                                                           });
                                                                           Navigator.of(context)
                                                                               .pop();
@@ -428,7 +428,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                                             _firestore.collection('transaction').add({
 
                                                                               'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n + (((_n/10).round()-1)*0.45)),
+                                                                              'qtt': (_n + (((_n/10).round()-1)*0.4)),
                                                                               'price': _price,
                                                                               'timestamp': DateTime.now(),
                                                                               'currency': currency,
@@ -442,7 +442,7 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                                             _firestore.collection('transaction').add({
 
                                                                               'name': ListOfPhones[index]['phonename'],
-                                                                              'qtt': (_n + ((_n/10).round()*0.45)),
+                                                                              'qtt': (_n + ((_n/10).round()*0.4)),
                                                                               'price': _price,
                                                                               'timestamp': DateTime.now(),
                                                                               'currency': currency,
@@ -529,10 +529,10 @@ class _AlfaScreenState extends State<AlfaScreen> {
 //                                                                          }
 //
 
-                                                                          setState(
-                                                                              () {
-                                                                            getqtt(ListOfPhones[index]['phonename']);
-                                                                          });
+//                                                                          setState(
+//                                                                              () {
+//                                                                            getqtt(ListOfPhones[index]['phonename']);
+//                                                                          });
                                                                           Navigator.of(context)
                                                                               .pop();
                                                                           Navigator.of(context)
@@ -553,12 +553,12 @@ class _AlfaScreenState extends State<AlfaScreen> {
                                                                           'currency':
                                                                               currency,
                                                                         });
-                                                                        setState(
-                                                                            () {
-                                                                          getqtt(ListOfPhones[index]
-                                                                              [
-                                                                              'phonename']);
-                                                                        });
+//                                                                        setState(
+//                                                                            () {
+//                                                                          getqtt(ListOfPhones[index]
+//                                                                              [
+//                                                                              'phonename']);
+//                                                                        });
                                                                         Navigator.of(context)
                                                                             .pop();
                                                                         Navigator.of(context)

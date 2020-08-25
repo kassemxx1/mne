@@ -175,13 +175,13 @@ class _ClientsTransactionTableState extends State<ClientsTransactionTable> {
                     ),
                     DataCell(
                       Text(
-                        '${FlutterMoneyFormatter(amount: trans.Debt).formattedNonSymbol}',
+                          '${FlutterMoneyFormatter(amount: trans.Debt).output.withoutFractionDigits}',
                         style: TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
-                    DataCell(Text('${FlutterMoneyFormatter(amount: trans.Price).formattedNonSymbol}',
+                    DataCell(Text('${FlutterMoneyFormatter(amount: trans.Price).output.withoutFractionDigits}',
                         style: TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold))),
@@ -213,11 +213,11 @@ class _ClientsTransactionTableState extends State<ClientsTransactionTable> {
                                       MaterialButton(
                                           child: Text('Yes'),
                                           onPressed: () async {
-                                            await _firestore
-                                                .collection('transaction')
-                                                .document('${trans.id}')
-                                                .delete();
-                                            Navigator.of(context).pop();
+//                                            await _firestore
+//                                                .collection('transaction')
+//                                                .document('${trans.id}')
+//                                                .delete();
+//                                            Navigator.of(context).pop();
                                             Navigator.of(context).pop();
                                           }),
                                     ],

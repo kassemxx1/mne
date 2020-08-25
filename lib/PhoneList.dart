@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'MainScreen.dart';
 import 'constants.dart';
 import 'package:custom_radio_grouped_button/custom_radio_grouped_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,11 +8,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:http/http.dart' as http;
 final _firestore = Firestore.instance;
 FirebaseStorage _storage = FirebaseStorage.instance;
 class PhonesList extends StatefulWidget {
   static const String id = 'PhoneList_Screen';
   static String subcat='';
+  static var allsum=[];
   @override
   _PhonesListState createState() => _PhonesListState();
 }
@@ -34,6 +37,10 @@ class _PhonesListState extends State<PhonesList> {
       });
 
     });
+  }
+  Future<double> getall() async {
+    var result = PhonesList.allsum.reduce((sum, element) => sum + element);
+    return new Future(() => result);
   }
 
 
@@ -142,6 +149,7 @@ class _PhonesListState extends State<PhonesList> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    PhonesList.allsum.clear();
     getPhonesList();
     delay();
   }
@@ -163,117 +171,118 @@ class _PhonesListState extends State<PhonesList> {
                   SliverAppBar(
 
                     actions: <Widget>[
+
                       IconButton(icon:Icon(Icons.add,color: Colors.black,),
 
                           onPressed:(){
                         var nn=1.0;
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        MaterialButton(
-
-                                          onPressed: (){
-                                            setState(() {
-
-                                              uploadPic();
-                                            },);
-                                          },
-                                          child: Text(upload,style: TextStyle(color: Colors.black),),
-                                          elevation: 20,
-                                          color: Colors.white,
-                                        ),
-
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10,top: 10),
-                                          child: TextField(
-                                            keyboardType: TextInputType
-                                                .emailAddress,
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                nameOfItem = value;
-                                              });
-                                            },
-                                            decoration:
-                                            KTextFieldImputDecoration
-                                                .copyWith(
-                                                hintText:
-                                                'Enter the Name Of Item'),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10,top: 10),
-                                          child: TextField(
-                                            keyboardType: TextInputType
-                                                .emailAddress,
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                PriceOfItem =
-                                                value;
-                                              });
-                                            },
-                                            decoration:
-                                            KTextFieldImputDecoration
-                                                .copyWith(
-                                                hintText:
-                                                'Enter the Price Of Item in \$'),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 10,top: 10),
-                                          child: TextField(
-                                            keyboardType: TextInputType
-                                                .emailAddress,
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value) {
-                                              setState(() {
-                                                nn =
-                                                (double.parse(value));
-                                              });
-                                            },
-                                            decoration:
-                                            KTextFieldImputDecoration
-                                                .copyWith(
-                                                hintText:
-                                                'Enter the Qtt'),
-                                          ),
-                                        ),
-                                        MaterialButton(
-                                            child: Text('Add',style: TextStyle(fontSize: 30,color: Colors.black),),
-                                            onPressed: (){
-                                          _firestore.collection('tele').add({
-                                            'phonename':nameOfItem,
-                                            'price': PriceOfItem,
-                                            'image': ImageLink,
-                                            'INOUT': 'out',
-                                            'categories':'phones',
-                                            'subcat':PhonesList.subcat,
-                                          });
-                                          _firestore.collection('transaction').add({
-                                            'name': nameOfItem,
-                                            'categorie': 'phones',
-                                            'inout': 'in',
-                                            'qtt': nn,
-                                          });
-                                          getPhonesList();
-                                          Navigator.of(context).pop();
-                                        }),
-
-
-
-                                      ],
-                                    ),
-                                  );
-                                });
+//                            showDialog(
+//                                context: context,
+//                                builder: (BuildContext context) {
+//                                  return AlertDialog(
+//
+//                                    content: Column(
+//                                      mainAxisSize: MainAxisSize.min,
+//                                      children: <Widget>[
+//                                        MaterialButton(
+//
+//                                          onPressed: (){
+//                                            setState(() {
+//
+//                                              uploadPic();
+//                                            },);
+//                                          },
+//                                          child: Text(upload,style: TextStyle(color: Colors.black),),
+//                                          elevation: 20,
+//                                          color: Colors.white,
+//                                        ),
+//
+//                                        Padding(
+//                                          padding: const EdgeInsets.only(
+//                                              left: 10, right: 10,top: 10),
+//                                          child: TextField(
+//                                            keyboardType: TextInputType
+//                                                .emailAddress,
+//                                            textAlign: TextAlign.center,
+//                                            onChanged: (value) {
+//                                              setState(() {
+//                                                nameOfItem = value;
+//                                              });
+//                                            },
+//                                            decoration:
+//                                            KTextFieldImputDecoration
+//                                                .copyWith(
+//                                                hintText:
+//                                                'Enter the Name Of Item'),
+//                                          ),
+//                                        ),
+//                                        Padding(
+//                                          padding: const EdgeInsets.only(
+//                                              left: 10, right: 10,top: 10),
+//                                          child: TextField(
+//                                            keyboardType: TextInputType
+//                                                .emailAddress,
+//                                            textAlign: TextAlign.center,
+//                                            onChanged: (value) {
+//                                              setState(() {
+//                                                PriceOfItem =
+//                                                value;
+//                                              });
+//                                            },
+//                                            decoration:
+//                                            KTextFieldImputDecoration
+//                                                .copyWith(
+//                                                hintText:
+//                                                'Enter the Price Of Item in \$'),
+//                                          ),
+//                                        ),
+//                                        Padding(
+//                                          padding: const EdgeInsets.only(
+//                                              left: 10, right: 10,top: 10),
+//                                          child: TextField(
+//                                            keyboardType: TextInputType
+//                                                .emailAddress,
+//                                            textAlign: TextAlign.center,
+//                                            onChanged: (value) {
+//                                              setState(() {
+//                                                nn =
+//                                                (double.parse(value));
+//                                              });
+//                                            },
+//                                            decoration:
+//                                            KTextFieldImputDecoration
+//                                                .copyWith(
+//                                                hintText:
+//                                                'Enter the Qtt'),
+//                                          ),
+//                                        ),
+//                                        MaterialButton(
+//                                            child: Text('Add',style: TextStyle(fontSize: 30,color: Colors.black),),
+//                                            onPressed: (){
+//                                          _firestore.collection('tele').add({
+//                                            'phonename':nameOfItem,
+//                                            'price': PriceOfItem,
+//                                            'image': ImageLink,
+//                                            'INOUT': 'out',
+//                                            'categories':'phones',
+//                                            'subcat':PhonesList.subcat,
+//                                          });
+//                                          _firestore.collection('transaction').add({
+//                                            'name': nameOfItem,
+//                                            'categorie': 'phones',
+//                                            'inout': 'in',
+//                                            'qtt': nn,
+//                                          });
+//                                          getPhonesList();
+//                                          Navigator.of(context).pop();
+//                                        }),
+//
+//
+//
+//                                      ],
+//                                    ),
+//                                  );
+//                                });
 
 
                       })
@@ -347,6 +356,7 @@ class _PhonesListState extends State<PhonesList> {
                                                         (BuildContext context,
                                                         AsyncSnapshot<double>
                                                         qttnumbr) {
+
                                                       return Center(
                                                         child: Text(
                                                           'Available : ${qttnumbr.data}',style: TextStyle(color:Colors.black),
@@ -467,12 +477,15 @@ class _PhonesListState extends State<PhonesList> {
                                                                   getqtt(
                                                                       ListOfPhones[index]['phonename']);
                                                                 });
+                                                                http.post('http://${MainScreen.ip}/cm?cmnd=Power%20On');
+
                                                                 Navigator.of(
                                                                     context)
                                                                     .pop();
                                                                 Navigator.of(
                                                                     context)
                                                                     .pop();
+
                                                               },
                                                             ),
 
@@ -526,6 +539,7 @@ class _PhonesListState extends State<PhonesList> {
                                         FutureBuilder(
                                             builder: (BuildContext context,
                                                 AsyncSnapshot<double> qttnumbr) {
+                                              PhonesList.allsum.add(qttnumbr.data.toDouble()*double.parse(ListOfPhones[index]['price']));
                                               return Center(
                                                 child: Row(
                                                   mainAxisAlignment:

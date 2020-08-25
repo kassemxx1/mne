@@ -62,7 +62,7 @@ class _FanytelScreenState extends State<FanytelScreen> {
                     children: <Widget>[
                       Text('Available:'),
                       Text(
-                        '${qttnumbr.data.round()}',
+                        '${qttnumbr.data.toStringAsFixed(2)}',
                         style: TextStyle(
                             fontSize: 16,
                             color: Colors.blueAccent),

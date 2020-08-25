@@ -21,9 +21,12 @@ import 'Report_Table.dart';
 import 'OMT_Table.dart';
 import 'ClientsTransactionTable.dart';
 import 'All_CLients.dart';
+import 'serverData.dart';
+import 'MaintenanceTable.dart';
 void main() => runApp(phone_sotre());
 
 class phone_sotre extends StatefulWidget {
+
   @override
   _phone_sotreState createState() => _phone_sotreState();
 }
@@ -56,6 +59,8 @@ class _phone_sotreState extends State<phone_sotre> {
         OmtTable.id:(context) =>OmtTable(),
         ClientsTransactionTable.id:(context) =>ClientsTransactionTable(),
         AllClients.id:(context) => AllClients(),
+        Servertest.id:(context) => Servertest(),
+        MaintenaceTable.id:(context) =>MaintenaceTable(),
 
 
       },

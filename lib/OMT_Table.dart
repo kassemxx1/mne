@@ -26,6 +26,8 @@ class _OmtTableState extends State<OmtTable> {
           OMTScreen.transaction[index]['curency'].toString(),
           OMTScreen.transaction[index]['id'].toString(),
           OMTScreen.transaction[index]['time'].toDate(),
+          OMTScreen.transaction[index]['description'],
+
         ));
       });
     }
@@ -97,6 +99,12 @@ class _OmtTableState extends State<OmtTable> {
                       'OUT',
                       style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                     )),
+                DataColumn(
+                    label: Text(
+                      'Description',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    )),
+                
 
                 DataColumn(
                     label: Text(
@@ -145,7 +153,11 @@ class _OmtTableState extends State<OmtTable> {
                           '-',
                           mm,
                           '-',
-                          dd
+                          dd,
+                          '   ',
+                          hh,
+                          ':',
+                          nn
                         ])}',
                         style: TextStyle(fontWeight: FontWeight.bold,fontSize: 14),
                       ),
@@ -153,13 +165,17 @@ class _OmtTableState extends State<OmtTable> {
                     ),
                     DataCell(
                       Text(
-                        '${FlutterMoneyFormatter(amount: trans.IN).formattedNonSymbol}',
+                        '${FlutterMoneyFormatter(amount: trans.IN).output.nonSymbol}',
                         style: TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
-                    DataCell(Text('${FlutterMoneyFormatter(amount: trans.OUT).formattedNonSymbol}',
+                    DataCell(Text('${FlutterMoneyFormatter(amount: trans.OUT).output.nonSymbol}',
+                        style: TextStyle(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold))),
+                    DataCell(Text(trans.description!=null?'${trans.description.toString()}':'---',
                         style: TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold))),
@@ -187,7 +203,7 @@ class _OmtTableState extends State<OmtTable> {
                                           child: Text('Yes'),
                                           onPressed: () async {
                                             await _firestore
-                                                .collection('transaction')
+                                                .collection('omt')
                                                 .document('${trans.ID}')
                                                 .delete();
                                             Navigator.of(context).pop();
@@ -215,6 +231,7 @@ class trans {
   String currency;
   String ID;
    DateTime time;
+   String description;
 
-  trans(this.IN,this.OUT, this.currency,this.ID,this.time);
+  trans(this.IN,this.OUT, this.currency,this.ID,this.time,this.description);
 }

@@ -76,21 +76,21 @@ class _MtcScreenState extends State<MtcScreen> {
     }
   }
 
-  Future<double> getqtt(String name) async {
-    var qtts = [0.0];
-
-    final messages = await _firestore
-        .collection('transaction')
-        .where('name', isEqualTo: name)
-        .getDocuments();
-    for (var msg in messages.documents) {
-      final qtt = msg['qtt'];
-      qtts.add(qtt.toDouble());
-    }
-
-    var result = qtts.reduce((sum, element) => sum + element);
-    return new Future(() => result.toDouble());
-  }
+//  Future<double> getqtt(String name) async {
+//    var qtts = [0.0];
+//
+//    final messages = await _firestore
+//        .collection('transaction')
+//        .where('name', isEqualTo: name)
+//        .getDocuments();
+//    for (var msg in messages.documents) {
+//      final qtt = msg['qtt'];
+//      qtts.add(qtt.toDouble());
+//    }
+//
+//    var result = qtts.reduce((sum, element) => sum + element);
+//    return new Future(() => result.toDouble());
+//  }
 
   @override
   void initState() {
@@ -149,28 +149,28 @@ class _MtcScreenState extends State<MtcScreen> {
                                   style: TextStyle(
                                       fontSize: 16, color: Colors.green),
                                 ),
-                                FutureBuilder(
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<double> qttnumbr) {
-                                      return Center(
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Text('Available:'),
-                                            Text(
-                                              '${ListOfPhones[index]['phonename'] == 'mtc\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Colors.blueAccent),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                    initialData: 0.0,
-                                    future: getqtt(
-                                        ListOfPhones[index]['phonename'])),
+//                                FutureBuilder(
+//                                    builder: (BuildContext context,
+//                                        AsyncSnapshot<double> qttnumbr) {
+//                                      return Center(
+//                                        child: Row(
+//                                          mainAxisAlignment:
+//                                              MainAxisAlignment.center,
+//                                          children: <Widget>[
+//                                            Text('Available:'),
+//                                            Text(
+//                                              '${ListOfPhones[index]['phonename'] == 'mtc\$\$\$' ? qttnumbr.data.toStringAsFixed(2) : qttnumbr.data.round()}',
+//                                              style: TextStyle(
+//                                                  fontSize: 16,
+//                                                  color: Colors.blueAccent),
+//                                            ),
+//                                          ],
+//                                        ),
+//                                      );
+//                                    },
+//                                    initialData: 0.0,
+//                                    future: getqtt(
+//                                        ListOfPhones[index]['phonename'])),
                                 MaterialButton(
                                   child: Text(
                                     'Sell',
@@ -219,21 +219,21 @@ class _MtcScreenState extends State<MtcScreen> {
                                                             FontWeight.bold,
                                                         color: Colors.green),
                                                   ),
-                                                  FutureBuilder(
-                                                      builder: (BuildContext
-                                                              context,
-                                                          AsyncSnapshot<double>
-                                                              qttnumbr) {
-                                                        return Center(
-                                                          child: Text(
-                                                            'Available : ${qttnumbr.data}',
-                                                          ),
-                                                        );
-                                                      },
-                                                      initialData: 1.0,
-                                                      future: getqtt(
-                                                          ListOfPhones[index]
-                                                              ['phonename'])),
+//                                                  FutureBuilder(
+//                                                      builder: (BuildContext
+//                                                              context,
+//                                                          AsyncSnapshot<double>
+//                                                              qttnumbr) {
+//                                                        return Center(
+//                                                          child: Text(
+//                                                            'Available : ${qttnumbr.data}',
+//                                                          ),
+//                                                        );
+//                                                      },
+//                                                      initialData: 1.0,
+//                                                      future: getqtt(
+//                                                          ListOfPhones[index]
+//                                                              ['phonename'])),
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.only(
@@ -469,10 +469,10 @@ class _MtcScreenState extends State<MtcScreen> {
 
 
 
-                                                                          setState(
-                                                                              () {
-                                                                            getqtt(ListOfPhones[index]['phonename']);
-                                                                          });
+//                                                                          setState(
+//                                                                              () {
+//                                                                            getqtt(ListOfPhones[index]['phonename']);
+//                                                                          });
                                                                           Navigator.of(context)
                                                                               .pop();
                                                                           Navigator.of(context)
@@ -503,11 +503,11 @@ class _MtcScreenState extends State<MtcScreen> {
                                                                                 DateTime.now(),
                                                                           });
 
-                                                                          setState(
-                                                                              () {
-                                                                            getqtt('mtc 22\$');
-                                                                            getqtt('mtc\$\$\$');
-                                                                          });
+//                                                                          setState(
+//                                                                              () {
+//                                                                            getqtt('mtc 22\$');
+//                                                                            getqtt('mtc\$\$\$');
+//                                                                          });
                                                                           Navigator.of(context)
                                                                               .pop();
                                                                           Navigator.of(context)
@@ -528,12 +528,12 @@ class _MtcScreenState extends State<MtcScreen> {
                                                                           'currency':
                                                                               currency,
                                                                         });
-                                                                        setState(
-                                                                            () {
-                                                                          getqtt(ListOfPhones[index]
-                                                                              [
-                                                                              'phonename']);
-                                                                        });
+//                                                                        setState(
+//                                                                            () {
+//                                                                          getqtt(ListOfPhones[index]
+//                                                                              [
+//                                                                              'phonename']);
+//                                                                        });
                                                                         Navigator.of(context)
                                                                             .pop();
                                                                         Navigator.of(context)

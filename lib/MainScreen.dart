@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:mne/EditItems.dart';
 import 'package:mne/accessoriescat.dart';
@@ -9,18 +11,39 @@ import 'clientsScreen.dart';
 import 'phonecategories.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'OthersScreen.dart';
-
+import 'package:http/http.dart' as http;
+import 'serverData.dart';
 
 var currentPage = 0;
 
 class MainScreen extends StatefulWidget {
   static const String id = 'Main_Screen';
+  static const String url = 'https://hidden-sea-16527.herokuapp.com/';
+  static var  ip = 'Main_Screen';
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
 
+void getip()async{
+  void getalltransaction()async{
+    var url =
+        'https://firestore.googleapis.com/v1beta1/projects/phonestore-cf23e/databases/(default)/documents/ip';
+    var response = await http.get(url);
+    Map data = json.decode(response.body);
+    for (var msg in data["documents"]) {
+      MainScreen.ip=msg['fields']['ip']['stringValue'].toString();
+    }
+
+  }
+}
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getip();
+  }
 
 
   @override

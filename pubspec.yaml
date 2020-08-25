@@ -13,24 +13,33 @@ dependencies:
 
 
   cupertino_icons: ^0.1.2
-  firebase_core: ^0.4.0+8
-  cloud_firestore: ^0.12.5+2
+  firebase_core: ^0.4.4+3
+  cloud_firestore: ^0.13.5
   cached_network_image: ^2.0.0
-  firebase_storage: ^3.0.3
+  firebase_storage: ^3.1.5
   shared_preferences: ^0.5.3+4
   custom_radio_grouped_button: ^1.0.0
   image_picker: ^0.6.1+3
   dropdown_formfield: ^0.1.0
-  flutter_datetime_picker: ^1.3.2
+  flutter_datetime_picker:
+    git:
+      url: https://github.com/derohimat/flutter_datetime_picker.git
   date_format: ^1.0.8
   autocomplete_textfield: ^1.7.3
   modal_progress_hud: ^0.1.3
   fancy_bottom_navigation: ^0.3.2
   auto_size_text: ^2.1.0
   esc_pos_printer: ^1.5.0
-  firebase: ^5.0.0
-  flutter_money_formatter: ^0.4.5
+  firebase: ^7.3.0
+  flutter_money_formatter: ^0.8.3
   http: ^0.12.0+4
+  provider: ^4.0.5
+  loading_animations: ^2.1.0
+  url_launcher: ^5.4.5
+#  flutter_sms: ^0.0.3
+#  sms: ^0.2.0
+#  sms_maintained: ^0.2.5
+
 
 
 

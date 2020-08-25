@@ -65,59 +65,61 @@ class _TableScreenState extends State<TableScreen> {
       ),
       body: Container(
         child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: DataTable(
-            sortColumnIndex: 0,
-            sortAscending: sort,
-            columns: [
-              DataColumn(
-                label: Text(
-                  'Date',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                onSort: (columnIndex, ascending) {
-                  setState(() {
-                    sort = !sort;
-                  });
-
-                  onSortColum(columnIndex, ascending);
-                },
-              ),
-              DataColumn(
-                label: Text(
-                  'Debt',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-                numeric: true,
-              ),
-              DataColumn(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              sortColumnIndex: 0,
+              sortAscending: sort,
+              columns: [
+                DataColumn(
                   label: Text(
-                'Debt analysis',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              )),
-              DataColumn(
-                  label: Text(
-                'Item',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              )),
-              DataColumn(
-                  label: Text(
-                    'QTT',
+                    'Date',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                  )),
-              DataColumn(
+                  ),
+                  onSort: (columnIndex, ascending) {
+                    setState(() {
+                      sort = !sort;
+                    });
+
+                    onSortColum(columnIndex, ascending);
+                  },
+                ),
+                DataColumn(
                   label: Text(
-                'Description',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              )),
-              DataColumn(
-                  label: Text(
-                'Action',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              )),
-            ],
-            rows: child
-                .map((trans) => DataRow(
+                    'Debt',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  numeric: true,
+                ),
+                DataColumn(
+                    label: Text(
+                  'Debt analysis',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Item',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                )),
+                DataColumn(
+                    label: Text(
+                      'QTT',
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    )),
+                DataColumn(
+                    label: Text(
+                  'Description',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                )),
+                DataColumn(
+                    label: Text(
+                  'Action',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                )),
+              ],
+              rows: child
+                  .map((trans) => DataRow(
 
 //                            showDialog(
 //                                context: context,
@@ -143,72 +145,73 @@ class _TableScreenState extends State<TableScreen> {
 //                                  );
 //                                });
 
-                        selected: true,
-                        cells: [
-                          DataCell(Text(
-                            '${formatDate(DateTime.parse(trans.time.toString()), [
-                              yyyy,
-                              '-',
-                              mm,
-                              '-',
-                              dd
-                            ])}',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          )),
-                          DataCell(
-                            Text(
-                              '${FlutterMoneyFormatter(amount:trans.Debt).formattedNonSymbol}',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold),
+                          selected: true,
+                          cells: [
+                            DataCell(Text(
+                              '${formatDate(DateTime.parse(trans.time.toString()), [
+                                yyyy,
+                                '-',
+                                mm,
+                                '-',
+                                dd
+                              ])}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            )),
+                            DataCell(
+                              Text(
+                                  '${FlutterMoneyFormatter(amount: trans.Debt).output.withoutFractionDigits}',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ),
-                          ),
-                          DataCell(Text('${FlutterMoneyFormatter(amount:trans.Price).formattedNonSymbol}',
-                              style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold))),
-                          DataCell(Text('${trans.Product}',
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold))),
-                          DataCell(Text('${trans.qtt}',
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold))),
-                          DataCell(Text('${trans.Description}',
-                              style: TextStyle(fontWeight: FontWeight.bold))),
-                          DataCell(
-                           IconButton(icon: Icon(Icons.delete,color: Colors.blue,),
-                            onPressed: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Are You Sure to Delete?'),
-                                      actions: <Widget>[
-                                        MaterialButton(
-                                          child: Text('Cancel'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        MaterialButton(
-                                            child: Text('Yes'),
-                                            onPressed: () async {
-                                              await _firestore
-                                                  .collection('transaction')
-                                                  .document('${trans.id}')
-                                                  .delete();
+                            DataCell(Text('${FlutterMoneyFormatter(amount: trans.Price).output.withoutFractionDigits}',
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold))),
+                            DataCell(Text('${trans.Product}',
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold))),
+                            DataCell(Text('${trans.qtt}',
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold))),
+                            DataCell(Text('${trans.Description}',
+                                style: TextStyle(fontWeight: FontWeight.bold))),
+                            DataCell(
+                             IconButton(icon: Icon(Icons.delete,color: Colors.blue,),
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Are You Sure to Delete?'),
+                                        actions: <Widget>[
+                                          MaterialButton(
+                                            child: Text('Cancel'),
+                                            onPressed: () {
                                               Navigator.of(context).pop();
-                                              Navigator.of(context).pop();
-                                            }),
-                                      ],
-                                    );
-                                  });
-                            },
-                          )),
-                        ]))
-                .toList(),
+                                            },
+                                          ),
+                                          MaterialButton(
+                                              child: Text('Yes'),
+                                              onPressed: () async {
+                                                await _firestore
+                                                    .collection('transaction')
+                                                    .document('${trans.id}')
+                                                    .delete();
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+                                              }),
+                                        ],
+                                      );
+                                    });
+                              },
+                            )),
+                          ]))
+                  .toList(),
+            ),
           ),
         ),
       ),

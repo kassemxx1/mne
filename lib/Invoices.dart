@@ -34,7 +34,7 @@ class _InvoicesState extends State<Invoices> {
 
   void getcategories(String cat) async {
     ListOfItems.clear();
-    if(cat=='phones'){
+    if (cat == 'phones') {
       final Messages = await _firestore
           .collection('tele')
           .where('categories', isEqualTo: cat)
@@ -48,11 +48,13 @@ class _InvoicesState extends State<Invoices> {
           });
         });
         ListOfItems.sort((a, b) {
-          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+          return a['display']
+              .toLowerCase()
+              .compareTo(b['display'].toLowerCase());
         });
       }
     }
-    if(cat=='accessories'){
+    if (cat == 'accessories') {
       final Messages = await _firestore
           .collection('accessories')
           .where('categories', isEqualTo: cat)
@@ -66,11 +68,12 @@ class _InvoicesState extends State<Invoices> {
           });
         });
         ListOfItems.sort((a, b) {
-          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+          return a['display']
+              .toLowerCase()
+              .compareTo(b['display'].toLowerCase());
         });
       }
-    }
-    else{
+    } else {
       final Messages = await _firestore
           .collection('phones')
           .where('categories', isEqualTo: cat)
@@ -88,8 +91,6 @@ class _InvoicesState extends State<Invoices> {
         return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
       });
     }
-
-
   }
 
   @override
@@ -130,7 +131,6 @@ class _InvoicesState extends State<Invoices> {
                   dataSource: catlist,
                   textField: 'display',
                   valueField: 'value',
-
                 ),
               );
             }
@@ -219,17 +219,38 @@ class _InvoicesState extends State<Invoices> {
                   ),
                 ),
                 onPressed: () {
-                  for (var i in listofInvoice) {
-                    _firestore.collection('transaction').add({
-                      'name': i['phonename'],
-                      'categorie': i['categorie'],
-                      'inout': 'in',
-                      'qtt': i['qtt'],
-                    });
-                  }
-                  setState(() {
-                    listofInvoice.clear();
-                  });
+                  return showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Are You Sure Mostapha ?'),
+                          actions: <Widget>[
+                            MaterialButton(
+                              child: Text('cancel'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            MaterialButton(
+                              child: Text('yes'),
+                              onPressed: () {
+                                for (var i in listofInvoice) {
+                                  _firestore.collection('transaction').add({
+                                    'name': i['phonename'],
+                                    'categorie': i['categorie'],
+                                    'inout': 'in',
+                                    'qtt': i['qtt'],
+                                  });
+                                }
+                                setState(() {
+                                  listofInvoice.clear();
+                                });
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
                 },
               );
             } else {

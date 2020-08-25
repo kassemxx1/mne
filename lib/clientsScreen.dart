@@ -1,16 +1,21 @@
+import 'dart:convert';
 import 'package:autocomplete_textfield/autocomplete_textfield.dart';
 import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dropdown_formfield/dropdown_formfield.dart';
+import 'package:mne/MainScreen.dart';
 import 'constants.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'Table_Screen.dart';
-import 'Table_Screen.dart';
 import 'package:flutter_money_formatter/flutter_money_formatter.dart';
 import 'ClientsTransactionTable.dart';
 import 'All_CLients.dart';
+import 'package:http/http.dart' as http;
+import 'package:loading_animations/loading_animations.dart';
+
+
 final _firestore = Firestore.instance;
 var name = '';
 var phonenumber = '';
@@ -25,13 +30,12 @@ class ClientsScreen extends StatefulWidget {
   static var transaction = [];
   static var dtransaction = [];
   static var ListOfPhones = [];
-  static var ListOfallClients=[];
+  static var ListOfallClients = [];
   @override
   _ClientsScreenState createState() => new _ClientsScreenState();
 }
 
 class _ClientsScreenState extends State<ClientsScreen> {
-
   TextEditingController _textEditingController1 = TextEditingController();
   TextEditingController _textEditingController2 = TextEditingController();
   TextEditingController _textEditingController3 = TextEditingController();
@@ -48,8 +52,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
   var qtt = -1.0;
   var debt = 0.0;
   var DebtAnalysis = 0.0;
-  var PhoneNumber='';
-
+  var PhoneNumber = '';
+  var deb = 'select client';
+  var all = '';
+  var showall = '';
   bool _saving = true;
   var tomorow = new DateTime(year, month, day, 23, 59, 59, 99, 99);
   var startDate = DateTime(year, month, day, 0, 0, 0, 0, 0);
@@ -63,41 +69,31 @@ class _ClientsScreenState extends State<ClientsScreen> {
     });
   }
 
-
   void getPhonesList() async {
     ClientsScreen.ListOfPhones.clear();
     try {
-
-      final messages = await _firestore.collection('nameofclients').getDocuments();
+      final messages =
+          await _firestore.collection('nameofclients').getDocuments();
       for (var msg in messages.documents) {
         final name = msg['name'].toString();
+        final phone=msg['phone'].toString();
 
         setState(() {
-          ClientsScreen.ListOfPhones.add({'phonename': name,});
+          ClientsScreen.ListOfPhones.add({
+            'phonename': name,
+            'phone':phone,
+          });
         });
         ClientsScreen.ListOfPhones.sort((a, b) {
-          return a['phonename'].toLowerCase().compareTo(b['phonename'].toLowerCase());
+          return a['phonename']
+              .toLowerCase()
+              .compareTo(b['phonename'].toLowerCase());
         });
-
       }
-
-
-    }
-    catch(e){
+    } catch (e) {
       print(e);
     }
   }
-
-
-
-
-
-
-
-
-
-
-
 
   void getcat() {
     catlist.clear();
@@ -108,16 +104,19 @@ class _ClientsScreenState extends State<ClientsScreen> {
       });
     }
   }
-  void getphone(String name) async{
-    final messages= await _firestore.collection('nameofclients').where('name',isEqualTo: name).getDocuments();
-    for(var msg in messages.documents){
-      final phone=msg.data['phone'].toString();
+
+  void getphone(String name) async {
+    final messages = await _firestore
+        .collection('nameofclients')
+        .where('name', isEqualTo: name)
+        .getDocuments();
+    for (var msg in messages.documents) {
+      final phone = msg.data['phone'].toString();
 
       setState(() {
-        PhoneNumber=phone;
+        PhoneNumber = phone;
       });
     }
-
   }
 
   void getcategories(String cat) async {
@@ -140,11 +139,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
           _saving = false;
         });
         ListOfItems.sort((a, b) {
-          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+          return a['display']
+              .toLowerCase()
+              .compareTo(b['display'].toLowerCase());
         });
-
       }
-
     }
     if (cat == 'accessories') {
       final Messages = await _firestore
@@ -161,7 +160,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
           _saving = false;
         });
         ListOfItems.sort((a, b) {
-          return a['display'].toLowerCase().compareTo(b['display'].toLowerCase());
+          return a['display']
+              .toLowerCase()
+              .compareTo(b['display'].toLowerCase());
         });
       }
     }
@@ -188,6 +189,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     setState(() {
       _saving = true;
     });
+
     final messages = await _firestore
         .collection('transaction')
         .where('client', isEqualTo: name)
@@ -211,7 +213,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
           'time': time,
           'id': ttime,
           'description': description,
-          'qtt':qtt,
+          'qtt': qtt,
         });
         _saving = false;
       });
@@ -262,58 +264,44 @@ class _ClientsScreenState extends State<ClientsScreen> {
         controller: TextEditingController(text: mytext),
         suggestions: suggestions,
         textChanged: (text) => currentText = text,
-
         submitOnSuggestionTap: true,
         textSubmitted: (text) {
           setState(() {
             mytext = text;
           });
           getphone(mytext);
-          getqtt(mytext);
+//          getqtt(mytext);
+          getdebt(mytext);
           gettransactiondate(mytext);
           gettransaction(today, tomorow, mytext);
         });
   }
-  Future<double> getqtt(String name) async {
-    var qtts = [0.0];
 
-    final messages = await _firestore
-        .collection('transaction')
-        .where('cat', isEqualTo: 'client')
-        .where('client', isEqualTo: name)
-        .getDocuments();
-    for (var msg in messages.documents) {
-      final qtt = msg['debt'];
-      final den = msg['price'];
-      qtts.add(qtt.toDouble());
-      qtts.add(-den.toDouble());
-    }
+  void getdebt(String name) async {
     setState(() {
-      _saving = false;
+      deb = '';
     });
-
-    var result = qtts.reduce((sum, element) => sum + element);
-    return new Future(() => result.toDouble());
+    var url = MainScreen.url + 'getclient/$name';
+    var response = await http.get(url);
+    Map data = json.decode(response.body);
+    print(data['value']);
+    var jjj = double.parse(data['value']);
+    setState(() {
+      deb =
+          '${FlutterMoneyFormatter(amount: jjj).output.withoutFractionDigits} L.L';
+    });
   }
-  Future<double> getall() async {
-    var qtts = [0.0];
 
-    final messages = await _firestore
-        .collection('transaction')
-        .where('cat', isEqualTo: 'client')
-        .getDocuments();
-    for (var msg in messages.documents) {
-      final qtt = msg['debt'];
-      final den = msg['price'];
-      qtts.add(qtt.toDouble());
-      qtts.add(-den.toDouble());
-    }
+  void getall() async {
     setState(() {
-      _saving = false;
+      showall = 'yes';
     });
-
-    var result = qtts.reduce((sum, element) => sum + element);
-    return new Future(() => result.toDouble());
+    var url = MainScreen.url + 'getall';
+    var response = await http.get(url);
+    Map data = (json.decode(response.body));
+    setState(() {
+      all = double.parse(data['value']).toString();
+    });
   }
 
   List<String> suggestions = [];
@@ -338,9 +326,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
     getcat();
     getclients();
-    delay();
+//    delay();
     gettransaction(today, tomorow, mytext);
     getPhonesList();
   }
@@ -360,64 +349,87 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return AlertDialog(
-                        content: Card(
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 8, top: 8, bottom: 8),
-                                child: TextField(
-                                  controller: _textEditingController4,
-                                  keyboardType: TextInputType.emailAddress,
-                                  textAlign: TextAlign.center,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      name = value;
-                                    });
-                                  },
-                                  decoration:
-                                      KTextFieldImputDecoration.copyWith(
-                                          hintText: 'Enter Name Of Client'),
+                      var _validate = false;
+                      return StatefulBuilder(
+                          builder: (context, setState) {
+                        return AlertDialog(
+                          content: Card(
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8, right: 8, top: 8, bottom: 8),
+                                  child: TextField(
+                                    controller: _textEditingController4,
+                                    keyboardType: TextInputType.emailAddress,
+                                    textAlign: TextAlign.center,
+                                    onChanged: (value) {
+
+                                      setState(() {
+                                        name = value;
+                                      });
+                                      print(_validate);
+                                    },
+                                    decoration:
+                                        InputDecoration(
+                                          errorText: _validate
+                                              ? 'Name already Exists'
+                                              : null,
+                                          hintText: 'Enter Name Of Client',
+                                        ),
+
+
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 8, right: 8, top: 8, bottom: 8),
-                                child: TextField(
-                                  controller: _textEditingController5,
-                                  keyboardType: TextInputType.emailAddress,
-                                  textAlign: TextAlign.center,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      phonenumber = value;
-                                    });
-                                  },
-                                  decoration:
-                                      KTextFieldImputDecoration.copyWith(
-                                          hintText:
-                                              'Enter PhoneNumber Of Client'),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8, right: 8, top: 8, bottom: 8),
+                                  child: TextField(
+                                    controller: _textEditingController5,
+                                    keyboardType: TextInputType.emailAddress,
+                                    textAlign: TextAlign.center,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        phonenumber = value;
+                                      });
+                                    },
+                                    decoration:
+                                        KTextFieldImputDecoration.copyWith(
+                                            hintText:
+                                                'Enter PhoneNumber Of Client'),
+                                  ),
                                 ),
-                              ),
-                              MaterialButton(
-                                onPressed: () {
-                                  _firestore.collection('nameofclients').add({
+                                MaterialButton(
+                                  onPressed: () {
+                                    for(var i in ClientsScreen.ListOfPhones){
+                                      if (i==name){
+
+                                          print(name);
+
+                                      }
+                                    }
+                                    if(_validate==false){
+                                    _firestore.collection('nameofclients').add({
                                     'name': name,
                                     'phone': phonenumber,
-                                  });
-                                  _textEditingController4.clear();
-                                  _textEditingController5.clear();
-                                  getclients();
-                                },
-                                child: Text(
-                                  'Send',
-                                  style: TextStyle(
-                                      color: Colors.blue, fontSize: 30),
-                                ),
-                              )
-                            ],
+                                    });
+                                    _textEditingController4.clear();
+                                    _textEditingController5.clear();
+                                    getclients();
+                                    Navigator.of(context).pop();
+                                    }
+                                  },
+                                  child: Text(
+                                    'Send',
+                                    style: TextStyle(
+                                        color: Colors.blue, fontSize: 30),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
+                        );
+                    }
                       );
                     });
               })
@@ -454,32 +466,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(5.0),
-                        child: FutureBuilder(
-                            builder: (BuildContext context,
-                                AsyncSnapshot<double> qttnumbr) {
-                              return Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        'Debt:',
-                                        style: TextStyle(
-                                            fontSize: 20, color: Colors.yellow),
-                                      ),
-                                    ),
-                                    Text(
-                                      '${qttnumbr.data.round()}',
-                                      style: TextStyle(
-                                          fontSize: 25, color: Colors.blue),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                            initialData: 0.0,
-                            future: getqtt(mytext)),
+                        child: deb == ''
+                            ? LoadingFlipping.circle(
+                                borderColor: Colors.yellow,
+                                borderSize: 3.0,
+                                size: 20.0,
+                              )
+                            : Text(
+                                '${deb}',
+                                style:
+                                    TextStyle(fontSize: 25, color: Colors.blue),
+                              ),
                       ),
                     ],
                   ),
@@ -488,7 +485,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
-                     'PhoneNumber:   $PhoneNumber' ,style: TextStyle(fontSize: 16,color: Colors.yellow,fontWeight: FontWeight.bold),
+                      'PhoneNumber:   $PhoneNumber',
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.yellow,
+                          fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -621,12 +622,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                       });
                                       if (DebtAnalysis == 0) {
                                         if (itemValue == 'mtc\$\$\$') {
-                                          if((qtt/10).round() > qtt/10){
-
-                                            _firestore.collection('transaction').add({
-
+                                          if ((qtt / 10).round() > qtt / 10) {
+                                            _firestore
+                                                .collection('transaction')
+                                                .add({
                                               'name': itemValue,
-                                              'qtt': (qtt + (((qtt/10).round()-1)*0.45)),
+                                              'qtt': (qtt +
+                                                  (((qtt / 10).round() - 1) *
+                                                      0.45)),
                                               'price': 0.0,
                                               'timestamp': DateTime.now(),
                                               'currency': 'L.L',
@@ -634,17 +637,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                               'debt': debt,
                                               'cat': 'client',
                                               'description': description,
-
-                                            }
-                                            );
+                                            });
                                             print('yes yes');
-
-                                          }
-                                          else{
-                                            _firestore.collection('transaction').add({
-
+                                          } else {
+                                            _firestore
+                                                .collection('transaction')
+                                                .add({
                                               'name': itemValue,
-                                              'qtt': (qtt + ((qtt/10).round()*0.45)),
+                                              'qtt': (qtt +
+                                                  ((qtt / 10).round() * 0.45)),
                                               'price': 0.0,
                                               'timestamp': DateTime.now(),
                                               'currency': 'L.L',
@@ -652,22 +653,18 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                               'debt': debt,
                                               'cat': 'client',
                                               'description': description,
-
                                             });
                                             print('no no');
                                           }
-
-
-
-                                        }
-                                     else   if (itemValue == 'alfa\$\$\$') {
-
-                                          if((qtt/10).round() > qtt/10){
-
-                                            _firestore.collection('transaction').add({
-
+                                        } else if (itemValue == 'alfa\$\$\$') {
+                                          if ((qtt / 10).round() > qtt / 10) {
+                                            _firestore
+                                                .collection('transaction')
+                                                .add({
                                               'name': itemValue,
-                                              'qtt': (qtt + (((qtt/10).round()-1)*0.45)),
+                                              'qtt': (qtt +
+                                                  (((qtt / 10).round() - 1) *
+                                                      0.4)),
                                               'price': 0.0,
                                               'timestamp': DateTime.now(),
                                               'currency': 'L.L',
@@ -675,17 +672,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                               'debt': debt,
                                               'cat': 'client',
                                               'description': description,
-
-                                            }
-                                            );
+                                            });
                                             print('yes yes');
-
-                                          }
-                                          else{
-                                            _firestore.collection('transaction').add({
-
+                                          } else {
+                                            _firestore
+                                                .collection('transaction')
+                                                .add({
                                               'name': itemValue,
-                                              'qtt': (qtt + ((qtt/10).round()*0.45)),
+                                              'qtt': (qtt +
+                                                  ((qtt / 10).round() * 0.4)),
                                               'price': 0.0,
                                               'timestamp': DateTime.now(),
                                               'currency': 'L.L',
@@ -693,15 +688,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                               'debt': debt,
                                               'cat': 'client',
                                               'description': description,
-
                                             });
                                             print('no no');
                                           }
-
-
-
-                                        }
-                                     else if(itemValue=='alfa Days'){
+                                        } else if (itemValue == 'alfa Days') {
                                           _firestore
                                               .collection('transaction')
                                               .add({
@@ -721,11 +711,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                             'name': 'alfa\$\$\$',
                                             'qtt': -qtt,
                                             'timestamp': Timestamp.now(),
-
                                           });
-
-                                        }
-                                        else if(itemValue=='mtc Days'){
+                                        } else if (itemValue == 'mtc Days') {
                                           _firestore
                                               .collection('transaction')
                                               .add({
@@ -746,12 +733,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                             'qtt': -qtt,
                                             'timestamp': Timestamp.now(),
                                           });
-
-                                        }
-
-
-
-                                     else {
+                                        } else {
                                           _firestore
                                               .collection('transaction')
                                               .add({
@@ -797,6 +779,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                       _textEditingController6.clear();
                                       gettransactiondate(mytext);
                                       gettransaction(today, tomorow, mytext);
+                                      getdebt(mytext);
 
                                       Navigator.of(context).pop();
                                     },
@@ -814,161 +797,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   ),
                 ),
                 MaterialButton(
-
                   onPressed: () {
                     setState(() {
                       gettransactiondate(mytext);
                     });
-
-                    print(ClientsScreen.transaction);
-
-//                    showDialog(
-//                        context: context,
-//                        builder: (BuildContext context) {
-//                          return AlertDialog(
-//
-//                            content: Scaffold(
-//                              resizeToAvoidBottomPadding: false,
-//                              appBar: AppBar(
-//                                title: Text(
-//                                  mytext.toString(),
-//                                  style: TextStyle(color: Colors.black),
-//                                ),
-//                                backgroundColor: Colors.white,
-//                              ),
-//                              body: Container(
-//                                child: new ListView.builder(
-//                                    itemCount: ClientsScreen.transaction.length,
-//                                    itemBuilder: (BuildContext cntxt, int index) {
-//                                      return Dismissible(
-//                                        background: Material(
-//                                          color: Colors.red,
-//                                        ),
-//                                        onDismissed:
-//                                            (DismissDirection direction)  {
-//                                              return showDialog(
-//                                                  context: context,
-//                                                  builder: (BuildContext context) {
-//                                                    return AlertDialog(
-//                                                      title: Text(
-//                                                          'Are You Sure To delete ?'),
-//                                                      actions: <Widget>[
-//                                                        MaterialButton(
-//                                                          child: Text('Cancel'),
-//                                                          onPressed: () {
-//                                                            Navigator.of(context)
-//                                                                .pop();
-//                                                          },
-//                                                        ),
-//                                                        MaterialButton(
-//                                                          child: Text('Yes'),
-//                                                          onPressed: () async {
-//                                                            await _firestore
-//                                                                .collection('transaction')
-//                                                                .document('${ClientsScreen.transaction[index]['id']}')
-//                                                                .delete();
-//
-//
-//                                                            ClientsScreen.transaction.remove(ClientsScreen.transaction[index]);
-//                                                            gettransactiondate(mytext);
-//                                                            Navigator.of(context)
-//                                                                .pop();
-//                                                          },
-//                                                        )
-//                                                      ],
-//                                                    );
-//                                                  });
-//
-//
-//
-//                                        },
-//                                        key: Key(ClientsScreen.transaction[index].toString()),
-//                                        child: Card(
-//                                          child: Column(
-//                                            children: <Widget>[
-//                                              Text('${ClientsScreen.transaction[index]['description']}'),
-//                                              ListTile(
-//                                                title: Text(
-//                                                  '${formatDate(DateTime.parse(ClientsScreen.transaction[index]['time'].toDate().toString()), [
-//                                                    yyyy,
-//                                                    '-',
-//                                                    mm,
-//                                                    '-',
-//                                                    dd
-//                                                  ])}',
-//                                                  style: TextStyle(
-//                                                      color: Colors.grey, fontSize: 12),
-//                                                ),
-//                                                subtitle: Row(
-//                                                  children: <Widget>[
-//                                                    Flexible(
-//                                                      child: Container(
-//                                                        child: Padding(
-//                                                          padding:
-//                                                              const EdgeInsets.all(8.0),
-//                                                          child: Text(
-//                                                            '${ClientsScreen.transaction[index]['debt'].toString()}',
-//                                                            style: TextStyle(
-//                                                                color: Colors.green,
-//                                                                fontSize: 10),
-//                                                          ),
-//                                                        ),
-//                                                        decoration: BoxDecoration(
-//                                                            border: Border.all(
-//                                                                color: Colors.black)),
-//                                                        width: 70,
-//                                                      ),
-//                                                    ),
-//                                                    Flexible(
-//                                                      child: Container(
-//                                                        decoration: BoxDecoration(
-//                                                            border: Border.all(
-//                                                                color: Colors.black)),
-//                                                        width: 70,
-//                                                        child: Padding(
-//                                                          padding:
-//                                                              const EdgeInsets.all(8.0),
-//                                                          child: Text(
-//                                                            '${ClientsScreen.transaction[index]['price']}',
-//                                                            style: TextStyle(
-//                                                                color: Colors.red,
-//                                                                fontSize: 10),
-//                                                          ),
-//                                                        ),
-//                                                      ),
-//                                                    ),
-//                                                    Flexible(
-//                                                      child: Container(
-//                                                        width: 70,
-//                                                        decoration: BoxDecoration(
-//                                                            border: Border.all(
-//                                                                color: Colors.black)),
-//                                                        child: Padding(
-//                                                          padding:
-//                                                              const EdgeInsets.all(8.0),
-//                                                          child: Text(
-//                                                            '${ClientsScreen.transaction[index]['product'].toString()}',
-//                                                            style: TextStyle(
-//                                                                color: Colors.blueAccent,
-//                                                                fontSize: 10),
-//                                                          ),
-//                                                        ),
-//                                                      ),
-//                                                    ),
-//                                                  ],
-//                                                ),
-//                                              ),
-//                                            ],
-//                                          ),
-//                                        ),
-//                                      );
-//                                    }),
-//                              ),
-//                            ),
-//                          );
-//                        });
                     TableScreen.header = mytext;
-
                     Navigator.pushNamed(context, TableScreen.id);
                   },
                   child: Text(
@@ -983,166 +816,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 MaterialButton(
                   onPressed: () {
                     gettransaction(today, tomorow, mytext);
-
-
-//                    showDialog(
-//                        context: context,
-//                        builder: (BuildContext context) {
-//                          return AlertDialog(
-//                            shape: RoundedRectangleBorder(
-//                                borderRadius:
-//                                    BorderRadius.all(Radius.circular(10.0))),
-//                            content: Scaffold(
-//                              appBar: AppBar(
-//                                title: Text(
-//                                  '${formatDate(now, [
-//                                    yyyy,
-//                                    '-',
-//                                    mm,
-//                                    '-',
-//                                    dd
-//                                  ])}',
-//                                  style: TextStyle(
-//                                      color: Colors.grey, fontSize: 12),
-//                                ),
-//                              ),
-//                              body: Container(
-//                                child: new ListView.builder(
-//                                    itemCount: dtransaction.length,
-//                                    itemBuilder:
-//                                        (BuildContext cntxt, int index) {
-//                                      return Dismissible(
-//                                        background: Material(
-//                                          color: Colors.red,
-//                                        ),
-//                                        onDismissed:
-//                                            (DismissDirection direction) {
-//                                          return showDialog(
-//                                              context: context,
-//                                              builder: (BuildContext context) {
-//                                                return AlertDialog(
-//                                                  title: Text(
-//                                                      'Are You Sure To delete ?'),
-//                                                  actions: <Widget>[
-//                                                    MaterialButton(
-//                                                      child: Text('Cancel'),
-//                                                      onPressed: () {
-//                                                        Navigator.of(context)
-//                                                            .pop();
-//                                                      },
-//                                                    ),
-//                                                    MaterialButton(
-//                                                      child: Text('Yes'),
-//                                                      onPressed: () async {
-//                                                        await _firestore
-//                                                            .collection(
-//                                                                'transaction')
-//                                                            .document(
-//                                                                '${dtransaction[index]['id']}')
-//                                                            .delete();
-//                                                        gettransaction(today,
-//                                                            tomorow, mytext);
-//                                                        dtransaction.remove(
-//                                                            dtransaction[
-//                                                                index]);
-//                                                        Navigator.of(context)
-//                                                            .pop();
-//                                                      },
-//                                                    )
-//                                                  ],
-//                                                );
-//                                              });
-//
-//                                        },
-//                                        key:
-//                                            Key(dtransaction[index].toString()),
-//                                        child: Card(
-//                                          child: ListTile(
-//                                            title: Text(
-//                                              '${dtransaction[index]['client'].toString()}',
-//                                              style: TextStyle(
-//                                                  color: Colors.blue,
-//                                                  fontSize: 10),
-//                                            ),
-//                                            subtitle: Row(
-//                                              children: <Widget>[
-//                                                Flexible(
-//                                                  child: Container(
-//                                                    child: Padding(
-//                                                      padding:
-//                                                          const EdgeInsets.all(
-//                                                              8.0),
-//                                                      child: Text(
-//                                                        '${dtransaction[index]['debt'].toString()}',
-//                                                        style: TextStyle(
-//                                                            color: Colors.green,
-//                                                            fontSize: 10),
-//                                                      ),
-//                                                    ),
-//                                                    decoration: BoxDecoration(
-//                                                        border: Border.all(
-//                                                            color:
-//                                                                Colors.black)),
-//                                                    width: 70,
-//                                                  ),
-//                                                ),
-//                                                Flexible(
-//                                                  child: Container(
-//                                                    decoration: BoxDecoration(
-//                                                        border: Border.all(
-//                                                            color:
-//                                                                Colors.black)),
-//                                                    width: 70,
-//                                                    child: Padding(
-//                                                      padding:
-//                                                          const EdgeInsets.all(
-//                                                              8.0),
-//                                                      child: Text(
-//                                                        '${dtransaction[index]['price']}',
-//                                                        style: TextStyle(
-//                                                            color: Colors.red,
-//                                                            fontSize: 10),
-//                                                      ),
-//                                                    ),
-//                                                  ),
-//                                                ),
-//                                                Flexible(
-//                                                  child: Container(
-//                                                    width: 70,
-//                                                    decoration: BoxDecoration(
-//                                                        border: Border.all(
-//                                                            color:
-//                                                                Colors.black)),
-//                                                    child: Padding(
-//                                                      padding:
-//                                                          const EdgeInsets.all(
-//                                                              8.0),
-//                                                      child: Text(
-//                                                        '${dtransaction[index]['name'].toString()}',
-//                                                        style: TextStyle(
-//                                                            color: Colors
-//                                                                .blueAccent,
-//                                                            fontSize: 10),
-//                                                      ),
-//                                                    ),
-//                                                  ),
-//                                                ),
-//                                              ],
-//                                            ),
-//                                          ),
-//                                        ),
-//                                      );
-//                                    }),
-//                              ),
-//                            ),
-//                          );
-//                        });
-
-                  Navigator.pushNamed(context, ClientsTransactionTable.id);
-
-
-
-
+                    Navigator.pushNamed(context, ClientsTransactionTable.id);
                   },
                   child: Text(
                     'Daily Report',
@@ -1154,14 +828,18 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   ),
                 ),
                 Center(
-                  child: MaterialButton(onPressed: (){
-                    Navigator.pushNamed(context, AllClients.id);
-                  },
-                    child: Text('All Clients',style: TextStyle(
-                      color: Colors.yellow,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),),
+                  child: MaterialButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, AllClients.id);
+                    },
+                    child: Text(
+                      'All Clients',
+                      style: TextStyle(
+                        color: Colors.yellow,
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
                 Card(
@@ -1174,11 +852,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         style: TextStyle(color: Colors.black54),
                       )),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(2.0),
                         child: Center(
-                          child: Row(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text('start Date:'),
                                   FlatButton(
@@ -1207,11 +888,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                           dd
                                         ])}',
                                         style: TextStyle(
-                                            color: Colors.yellow, fontSize: 15),
+                                            color: Colors.yellow, fontSize: 10),
                                       )),
                                 ],
                               ),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   Text('End Date:'),
                                   FlatButton(
@@ -1241,7 +923,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                           dd
                                         ])}',
                                         style: TextStyle(
-                                            color: Colors.yellow, fontSize: 15),
+                                            color: Colors.yellow, fontSize: 10),
                                       )),
                                 ],
                               ),
@@ -1252,183 +934,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       MaterialButton(
                         onPressed: () {
                           gettransaction(startDate, endDate, mytext);
-
-//                          showDialog(
-//                              context: context,
-//                              builder: (BuildContext context) {
-//                                return AlertDialog(
-//                                  shape: RoundedRectangleBorder(
-//                                      borderRadius: BorderRadius.all(
-//                                          Radius.circular(10.0))),
-//                                  content: Scaffold(
-//                                    body: Container(
-//                                      child: new ListView.builder(
-//                                          itemCount: dtransaction.length,
-//                                          itemBuilder:
-//                                              (BuildContext cntxt, int index) {
-//                                            return Dismissible(
-//                                              background: Material(
-//                                                color: Colors.red,
-//                                              ),
-//                                              onDismissed:
-//                                                  (DismissDirection direction) {
-//                                                return showDialog(
-//                                                    context: context,
-//                                                    builder:
-//                                                        (BuildContext context) {
-//                                                      return AlertDialog(
-//                                                        title: Text(
-//                                                            'Are You Sure To delete ?'),
-//                                                        actions: <Widget>[
-//                                                          MaterialButton(
-//                                                            child:
-//                                                                Text('Cancel'),
-//                                                            onPressed: () {
-//                                                              Navigator.of(
-//                                                                      context)
-//                                                                  .pop();
-//                                                            },
-//                                                          ),
-//                                                          MaterialButton(
-//                                                            child: Text('Yes'),
-//                                                            onPressed:
-//                                                                () async {
-//                                                              await _firestore
-//                                                                  .collection(
-//                                                                      'transaction')
-//                                                                  .document(
-//                                                                      '${dtransaction[index]['id']}')
-//                                                                  .delete();
-//                                                              gettransaction(
-//                                                                  today,
-//                                                                  tomorow,
-//                                                                  mytext);
-//                                                              dtransaction.remove(
-//                                                                  dtransaction[
-//                                                                      index]);
-//                                                              gettransaction(
-//                                                                  today,
-//                                                                  tomorow,
-//                                                                  mytext);
-//                                                              Navigator.of(
-//                                                                      context)
-//                                                                  .pop();
-//                                                            },
-//                                                          )
-//                                                        ],
-//                                                      );
-//                                                    });
-//                                              },
-//                                              key: Key(dtransaction[index]
-//                                                  .toString()),
-//                                              child: Card(
-//                                                child: Column(
-//                                                  children: <Widget>[
-//                                                    Text(
-//                                                      '${formatDate(DateTime.parse(dtransaction[index]['time'].toDate().toString()), [
-//                                                        yyyy,
-//                                                        '-',
-//                                                        mm,
-//                                                        '-',
-//                                                        dd
-//                                                      ])}',
-//                                                      style: TextStyle(
-//                                                          color: Colors.grey,
-//                                                          fontSize: 12),
-//                                                    ),
-//                                                    ListTile(
-//                                                      title: Text(
-//                                                        '${dtransaction[index]['client'].toString()}',
-//                                                        style: TextStyle(
-//                                                            color: Colors.blue,
-//                                                            fontSize: 10),
-//                                                      ),
-//                                                      subtitle: Row(
-//                                                        children: <Widget>[
-//                                                          Flexible(
-//                                                            child: Container(
-//                                                              child: Padding(
-//                                                                padding:
-//                                                                    const EdgeInsets
-//                                                                            .all(
-//                                                                        8.0),
-//                                                                child: Text(
-//                                                                  '${dtransaction[index]['debt'].toString()}',
-//                                                                  style: TextStyle(
-//                                                                      color: Colors
-//                                                                          .green,
-//                                                                      fontSize:
-//                                                                          10),
-//                                                                ),
-//                                                              ),
-//                                                              decoration: BoxDecoration(
-//                                                                  border: Border.all(
-//                                                                      color: Colors
-//                                                                          .black)),
-//                                                              width: 70,
-//                                                            ),
-//                                                          ),
-//                                                          Flexible(
-//                                                            child: Container(
-//                                                              decoration: BoxDecoration(
-//                                                                  border: Border.all(
-//                                                                      color: Colors
-//                                                                          .black)),
-//                                                              width: 70,
-//                                                              child: Padding(
-//                                                                padding:
-//                                                                    const EdgeInsets
-//                                                                            .all(
-//                                                                        8.0),
-//                                                                child: Text(
-//                                                                  '${dtransaction[index]['price']}',
-//                                                                  style: TextStyle(
-//                                                                      color: Colors
-//                                                                          .red,
-//                                                                      fontSize:
-//                                                                          10),
-//                                                                ),
-//                                                              ),
-//                                                            ),
-//                                                          ),
-//                                                          Flexible(
-//                                                            child: Container(
-//                                                              width: 70,
-//                                                              decoration: BoxDecoration(
-//                                                                  border: Border.all(
-//                                                                      color: Colors
-//                                                                          .black)),
-//                                                              child: Padding(
-//                                                                padding:
-//                                                                    const EdgeInsets
-//                                                                            .all(
-//                                                                        8.0),
-//                                                                child: Text(
-//                                                                  '${dtransaction[index]['name'].toString()}',
-//                                                                  style: TextStyle(
-//                                                                      color: Colors
-//                                                                          .blueAccent,
-//                                                                      fontSize:
-//                                                                          10),
-//                                                                ),
-//                                                              ),
-//                                                            ),
-//                                                          ),
-//                                                        ],
-//                                                      ),
-//                                                    ),
-//                                                  ],
-//                                                ),
-//                                              ),
-//                                            );
-//                                          }),
-//                                    ),
-//                                  ),
-//                                );
-//                              });
-
-
-                          Navigator.pushNamed(context, ClientsTransactionTable.id);
+                          Navigator.pushNamed(
+                              context, ClientsTransactionTable.id);
                         },
                         child: Text(
                           'Transaction',
@@ -1442,24 +949,29 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     ],
                   ),
                 ),
-
-
-                Center(
-                  child: FutureBuilder(
-                      builder:
-                          (BuildContext context, AsyncSnapshot<
-                          double> qttnumbr) {
-                        return Center(
-                          child: Text(
-                            'All  : ${FlutterMoneyFormatter(amount: qttnumbr.data).formattedNonSymbol} ', style: TextStyle(
-                              color: Colors.black, fontSize: 18),
-                          ),
-                        );
-                      },
-                      initialData: 1.0,
-                      future: getall()),
-
-                ),
+                showall == ''
+                    ? FlatButton(
+                        onPressed: () {
+                          getall();
+                        },
+                        child: Text(
+                          'get the Sum of Debts',
+                          style: TextStyle(color: Colors.yellow, fontSize: 25),
+                        ),
+                      )
+                    : all == ''
+                        ? LoadingFlipping.circle(
+                            borderColor: Colors.yellow,
+                            borderSize: 3.0,
+                            size: 20.0,
+                            duration: Duration(hours: 1),
+                          )
+                        : Center(
+                            child: Text(
+                            'Sum = ${all.toString()}',
+                            style:
+                                TextStyle(color: Colors.yellow, fontSize: 25),
+                          )),
               ],
             ),
           ),

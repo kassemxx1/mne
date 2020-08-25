@@ -14,12 +14,34 @@ class _EditItemsState extends State<EditItems> {
   var categorie='phones';
 
   var ListOfItems = [];
+  var sumofitems=[];
 
 
 
 
 
+  Future<double> getqtt(String name) async {
+    var qtts = [0.0];
 
+    final messages = await _firestore
+        .collection('transaction')
+        .where('name', isEqualTo: name)
+        .getDocuments();
+    for (var msg in messages.documents) {
+      final qtt = msg['qtt'];
+
+      qtts.add(qtt);
+    }
+
+    var result = qtts.reduce((sum, element) => sum + element);
+    setState(() {
+      sumofitems.add({
+        'name':name,
+        'sum':result,
+      });
+    });
+    return new Future(() => result);
+  }
   void getcategories(String cat) async {
     ListOfItems.clear();
     if (cat == 'phones') {
@@ -29,7 +51,7 @@ class _EditItemsState extends State<EditItems> {
           .getDocuments();
       for (var msg in Messages.documents) {
         final name = msg.data['phonename'].toString();
-        final price=msg.data['price'].toString();
+        final price=double.parse(msg.data['price']);
         final id=msg.documentID;
         setState(() {
           ListOfItems.add({
@@ -51,7 +73,7 @@ class _EditItemsState extends State<EditItems> {
           .getDocuments();
       for (var msg in Messages.documents) {
         final name = msg.data['phonename'].toString();
-        final price=msg.data['price'].toString();
+        final price=double.parse(msg.data['price']);
         final id=msg.documentID;
         setState(() {
           ListOfItems.add({
@@ -74,7 +96,7 @@ class _EditItemsState extends State<EditItems> {
         .getDocuments();
     for (var msg in Messages.documents) {
       final name = msg.data['phonename'].toString();
-      final price=msg.data['price'].toString();
+      final price=double.parse(msg.data['price']);
       final id=msg.documentID;
       setState(() {
         ListOfItems.add({
@@ -94,6 +116,7 @@ class _EditItemsState extends State<EditItems> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    sumofitems.clear();
     getcategories(categorie);
   }
 
@@ -138,7 +161,25 @@ class _EditItemsState extends State<EditItems> {
 
           itemBuilder: (context,index){
             return ListTile(
-              title: Text(ListOfItems[index]['name'],style: TextStyle(color: Colors.yellow,fontSize: 20),),
+              title: Row(
+                children: <Widget>[
+                  Text(ListOfItems[index]['name'],style: TextStyle(color: Colors.yellow,fontSize: 20),),
+                  FutureBuilder(
+                      builder: (BuildContext context,
+                          AsyncSnapshot<double> qttnumbr) {
+                        return Center(
+                          child: Text(
+                            '    ${qttnumbr.data}',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.green),
+                          ),
+                        );
+                      },
+                      initialData: 0.0,
+                      future: getqtt(ListOfItems[index]['name']),
+                  )],
+              ),
               onTap:(){
                 showDialog(context: context,
                   builder: (BuildContext context){

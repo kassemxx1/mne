@@ -520,7 +520,7 @@ class _AccessoriesScreenState extends State<AccessoriesScreen> {
                     ),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       ///no.of items in the horizontal axis
-                      crossAxisCount: 2,
+                      crossAxisCount: 3,
                     ))
               ],
             ),
